@@ -1,19 +1,33 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 export const ExhibitionForm = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    const form = e.target as HTMLFormElement;
+    const data = new FormData(form);
+    try {
+      await api.leads.submitExhibition({
+        company_name: data.get("company_name") as string,
+        contact_person: data.get("contact_person") as string,
+        email: data.get("email") as string,
+        phone: data.get("phone") as string,
+        stand_size: data.get("stand_size") as string,
+        notes: data.get("notes") as string,
+      });
       toast({ title: "Заявка отправлена!", description: "Мы свяжемся с вами в ближайшее время." });
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      form.reset();
+    } catch {
+      toast({ title: "Ошибка отправки", description: "Попробуйте позже.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,11 +51,13 @@ export const ExhibitionForm = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <input
                 required
+                name="company_name"
                 placeholder="Название компании"
                 className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan transition-colors text-sm"
               />
               <input
                 required
+                name="contact_person"
                 placeholder="Контактное лицо"
                 className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan transition-colors text-sm"
               />
@@ -49,12 +65,14 @@ export const ExhibitionForm = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <input
                 required
+                name="email"
                 type="email"
                 placeholder="Email"
                 className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan transition-colors text-sm"
               />
               <input
                 required
+                name="phone"
                 type="tel"
                 placeholder="Телефон"
                 className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan transition-colors text-sm"
@@ -62,6 +80,7 @@ export const ExhibitionForm = () => {
             </div>
             <select
               required
+              name="stand_size"
               className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground focus:outline-none focus:border-neon-cyan transition-colors text-sm"
             >
               <option value="">Размер стенда</option>
@@ -71,6 +90,7 @@ export const ExhibitionForm = () => {
               <option value="premium">Премиум (25 м²)</option>
             </select>
             <textarea
+              name="notes"
               placeholder="Дополнительные пожелания"
               rows={3}
               className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan transition-colors text-sm resize-none"
