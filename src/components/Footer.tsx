@@ -4,8 +4,8 @@ export const Footer = () => {
       <div className="container">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <span className="font-display text-lg font-bold text-neon-cyan">LEGAL</span>
-            <span className="font-display text-lg font-bold text-neon-magenta">TECH</span>
+            <span className="font-display text-lg font-bold text-neon-cyan">ТЕХНОЛОГИИ</span>
+            <span className="font-display text-lg font-bold text-neon-magenta">ПРАВА</span>
             <p className="text-muted-foreground text-sm mt-1">Технологии в сфере права • 2026</p>
           </div>
           <div className="flex gap-8 text-sm text-muted-foreground">
@@ -19,6 +19,6 @@ export const Footer = () => {
           © 2026 LegalTech Conference. Все права защищены.
         </div>
       </div>
-    </footer>
-  );
+    </footer>);
+
 };
