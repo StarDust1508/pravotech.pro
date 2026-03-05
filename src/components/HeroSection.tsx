@@ -15,21 +15,21 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="max-w-2xl"
-        >
+          className="max-w-2xl">
+          
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-neon-cyan/30 bg-muted/50 backdrop-blur mb-6">
-            <span className="text-neon-cyan font-display text-sm font-bold">15–16 ОКТЯБРЯ 2026</span>
+            <span className="text-neon-cyan font-display text-sm font-bold">24–25 ИЮНЯ 2026</span>
             <span className="text-muted-foreground text-sm">Москва, Технограм</span>
           </div>
 
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-2">
-            <span className="text-neon-cyan">LEGAL</span>
+            <span className="text-neon-cyan">Технологии</span>
             <br />
-            <span className="text-neon-magenta">TECH</span>
+            <span className="text-neon-magenta">ПРАВА</span>
           </h1>
 
           <p className="font-display text-lg md:text-xl font-bold text-foreground/90 mb-4 uppercase tracking-wide">
-            Технологии в сфере права
+
           </p>
           <p className="text-muted-foreground text-base md:text-lg mb-8 max-w-lg">
             Крупнейшая конференция и выставка, посвящённая технологиям в юриспруденции. 
@@ -39,19 +39,19 @@ export const HeroSection = () => {
           <div className="flex flex-wrap gap-4">
             <a
               href="#register"
-              className="px-8 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider"
-            >
+              className="px-8 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider">
+              
               Получить билет
             </a>
             <a
               href="#exhibition"
-              className="px-8 py-3 border border-neon-cyan text-neon-cyan font-display font-bold rounded-lg hover:bg-accent/10 transition-colors text-sm uppercase tracking-wider"
-            >
+              className="px-8 py-3 border border-neon-cyan text-neon-cyan font-display font-bold rounded-lg hover:bg-accent/10 transition-colors text-sm uppercase tracking-wider">
+              
               Забронировать стенд
             </a>
           </div>
         </motion.div>
       </div>
-    </section>
-  );
+    </section>);
+
 };
