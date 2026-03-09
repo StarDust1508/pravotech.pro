@@ -26,24 +26,58 @@ export const HeroSection = () => {
             alt="Технологии в праве" 
             className="w-full h-full object-cover" 
           />
-          {/* Headphone Neon Scanline */}
-          <motion.div 
-            className="absolute hidden md:block bg-[#00ffff] pointer-events-none mix-blend-screen"
+          {/* Cyber-Neck Water Flow Effect */}
+          <svg
+            className="absolute hidden md:block pointer-events-none mix-blend-color-dodge"
             style={{ 
-              top: '15%', 
-              left: '31%', 
+              top: '52%', 
+              left: '39%', 
               width: '8%', 
-              height: '2px',
-              boxShadow: '0 0 20px 8px #00ffff, 0 0 40px 15px rgba(0,255,255,0.6)',
-              borderRadius: '50%',
-              rotate: '-10deg'
+              height: '18%',
+              filter: 'drop-shadow(0 0 5px rgba(0, 255, 255, 0.8)) drop-shadow(0 0 15px rgba(255, 0, 255, 0.4))'
             }}
-            animate={{ 
-              opacity: [0, 1, 1, 0],
-              y: [0, 120, 120, 0],
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          />
+            viewBox="0 0 100 200"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            {/* Background faint tubes */}
+            <path
+              d="M 70 0 C 60 80, 40 140, 20 200"
+              fill="none"
+              stroke="rgba(0, 255, 255, 0.1)"
+              strokeWidth="6"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 90 20 C 80 90, 60 150, 40 210"
+              fill="none"
+              stroke="rgba(255, 0, 255, 0.1)"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+            
+            {/* Cyan water droplet flowing */}
+            <motion.path
+              d="M 70 0 C 60 80, 40 140, 20 200"
+              fill="none"
+              stroke="#00ffff"
+              strokeWidth="6"
+              strokeLinecap="round"
+              initial={{ strokeDasharray: "25 250", strokeDashoffset: 250 }}
+              animate={{ strokeDashoffset: -50 }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
+            />
+            {/* Magenta water droplet flowing */}
+            <motion.path
+              d="M 90 20 C 80 90, 60 150, 40 210"
+              fill="none"
+              stroke="#ff00ff"
+              strokeWidth="4"
+              strokeLinecap="round"
+              initial={{ strokeDasharray: "15 250", strokeDashoffset: 280 }}
+              animate={{ strokeDashoffset: -20 }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "linear" }}
+            />
+          </svg>
           {/* Scale Base Neon Sweep */}
           <motion.div 
             className="absolute hidden md:block bg-[#ff00ff] pointer-events-none mix-blend-screen"
