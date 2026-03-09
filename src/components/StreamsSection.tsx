@@ -37,7 +37,19 @@ export const StreamsSection = () => {
                   : "border-border bg-card hover:border-neon-cyan/50"
               }`}
             >
-              <stream.icon className={`w-10 h-10 mb-4 ${i === 0 ? "text-neon-magenta" : "text-neon-cyan"}`} />
+              <div className="relative w-10 h-10 mb-4">
+                <stream.icon className={`absolute inset-0 w-10 h-10 ${i === 0 ? "text-neon-magenta" : "text-neon-cyan"}`} />
+                {stream.icon === Scale && (
+                  <motion.div
+                    className="absolute inset-0 flex items-center justify-center -top-2"
+                    animate={{ rotate: [-10, 10, -10] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                     <div className="w-[10px] h-[10px] bg-neon-cyan rounded-full shadow-[0_0_10px_#00f0ff] translate-x-3 translate-y-2"></div>
+                     <div className="w-[6px] h-[6px] bg-neon-magenta rounded-full shadow-[0_0_10px_#ff00ff] -translate-x-3 translate-y-1"></div>
+                  </motion.div>
+                )}
+              </div>
               <h3 className="font-display text-lg font-bold mb-2">{stream.title}</h3>
               <p className="text-muted-foreground text-sm">{stream.desc}</p>
             </motion.div>

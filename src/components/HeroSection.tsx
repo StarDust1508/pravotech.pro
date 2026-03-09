@@ -12,7 +12,17 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
       <div className="absolute inset-0">
-        <img src={heroImage} alt="Технологии в праве" className="w-full h-full object-cover" />
+        <motion.img 
+          src={heroImage} 
+          alt="Технологии в праве" 
+          className="w-full h-full object-cover origin-center" 
+          animate={{ 
+            scale: [1, 1.15, 1],
+            x: ["0%", "-2%", "0%"],
+            y: ["0%", "-1%", "0%"]
+          }} 
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} 
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
       </div>
