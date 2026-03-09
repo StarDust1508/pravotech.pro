@@ -12,17 +12,45 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
       <div className="absolute inset-0">
-        <motion.img 
-          src={heroImage} 
-          alt="Технологии в праве" 
-          className="w-full h-full object-cover origin-center" 
+        <motion.div
+          className="w-full h-full relative origin-center"
           animate={{ 
             scale: [1, 1.15, 1],
             x: ["0%", "-2%", "0%"],
             y: ["0%", "-1%", "0%"]
           }} 
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} 
-        />
+        >
+          <img 
+            src={heroImage} 
+            alt="Технологии в праве" 
+            className="w-full h-full object-cover" 
+          />
+          {/* Headphone Neon Glow */}
+          <motion.div 
+            className="absolute hidden md:block rounded-full bg-[#00ffff] blur-[40px] pointer-events-none mix-blend-screen"
+            style={{ top: '22%', left: '33%', width: '8%', height: '15%' }}
+            animate={{ 
+              opacity: [0.1, 0.7, 0.1],
+              scale: [0.8, 1.2, 0.8]
+            }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          {/* Scale Left Glow */}
+          <motion.div 
+            className="absolute hidden md:block rounded-full bg-[#00ffff] blur-[50px] pointer-events-none mix-blend-screen"
+            style={{ top: '55%', left: '60%', width: '15%', height: '10%' }}
+            animate={{ opacity: [0.2, 0.6, 0.2] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          />
+          {/* Scale Right Glow */}
+          <motion.div 
+            className="absolute hidden md:block rounded-full bg-[#ff00ff] blur-[50px] pointer-events-none mix-blend-screen"
+            style={{ top: '52%', left: '78%', width: '15%', height: '10%' }}
+            animate={{ opacity: [0.1, 0.5, 0.1] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          />
+        </motion.div>
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
       </div>
