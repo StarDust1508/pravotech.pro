@@ -2,6 +2,13 @@ import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-image.jpg";
 
 export const HeroSection = () => {
+  const scrollToSection = (href: string) => {
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
       <div className="absolute inset-0">
@@ -37,18 +44,18 @@ export const HeroSection = () => {
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <a
-              href="#register"
+            <button
+              onClick={() => scrollToSection("#tickets")}
               className="px-8 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider">
               
               Получить билет
-            </a>
-            <a
-              href="#exhibition"
+            </button>
+            <button
+              onClick={() => scrollToSection("#exhibition")}
               className="px-8 py-3 border border-neon-cyan text-neon-cyan font-display font-bold rounded-lg hover:bg-accent/10 transition-colors text-sm uppercase tracking-wider">
               
               Забронировать стенд
-            </a>
+            </button>
           </div>
         </motion.div>
       </div>
