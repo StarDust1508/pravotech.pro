@@ -26,29 +26,41 @@ export const HeroSection = () => {
             alt="Технологии в праве" 
             className="w-full h-full object-cover" 
           />
-          {/* Headphone Neon Glow */}
+          {/* Headphone Neon Scanline */}
           <motion.div 
-            className="absolute hidden md:block rounded-full bg-[#00ffff] blur-[40px] pointer-events-none mix-blend-screen"
-            style={{ top: '22%', left: '33%', width: '8%', height: '15%' }}
-            animate={{ 
-              opacity: [0.1, 0.7, 0.1],
-              scale: [0.8, 1.2, 0.8]
+            className="absolute hidden md:block bg-[#00ffff] pointer-events-none mix-blend-screen"
+            style={{ 
+              top: '15%', 
+              left: '31%', 
+              width: '8%', 
+              height: '2px',
+              boxShadow: '0 0 20px 8px #00ffff, 0 0 40px 15px rgba(0,255,255,0.6)',
+              borderRadius: '50%',
+              rotate: '-10deg'
             }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ 
+              opacity: [0, 1, 1, 0],
+              y: [0, 120, 120, 0],
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
           />
-          {/* Scale Left Glow */}
+          {/* Scale Base Neon Sweep */}
           <motion.div 
-            className="absolute hidden md:block rounded-full bg-[#00ffff] blur-[50px] pointer-events-none mix-blend-screen"
-            style={{ top: '55%', left: '60%', width: '15%', height: '10%' }}
-            animate={{ opacity: [0.2, 0.6, 0.2] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          />
-          {/* Scale Right Glow */}
-          <motion.div 
-            className="absolute hidden md:block rounded-full bg-[#ff00ff] blur-[50px] pointer-events-none mix-blend-screen"
-            style={{ top: '52%', left: '78%', width: '15%', height: '10%' }}
-            animate={{ opacity: [0.1, 0.5, 0.1] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            className="absolute hidden md:block bg-[#ff00ff] pointer-events-none mix-blend-screen"
+            style={{ 
+              top: '68%', 
+              left: '55%', 
+              width: '28%', 
+              height: '3px',
+              boxShadow: '0 0 20px 8px #ff00ff, 0 0 40px 15px rgba(255,0,255,0.6)',
+              borderRadius: '50%'
+            }}
+            animate={{ 
+              opacity: [0, 0.8, 0],
+              scaleX: [0.5, 1, 0.5],
+              y: [0, -40, 0]
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
