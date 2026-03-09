@@ -80,6 +80,30 @@ export interface SponsorLead {
   created_at: string;
 }
 
+export interface TicketLead {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  ticket_type: string;
+  ticket_price: string;
+  payment_method: string;
+  created_at: string;
+}
+
+export interface Participant {
+  id: string;
+  company_name: string;
+  logo_url: string;
+  website_url: string;
+  industry: string;
+  description: string;
+  display_order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Media {
   id: string;
   file_name: string;
@@ -93,6 +117,7 @@ export interface LeadStats {
   exhibition: number;
   speakers: number;
   sponsors: number;
+  tickets: number;
 }
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -151,10 +176,25 @@ export const api = {
       request<SponsorTier>(`/sponsors/tiers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   },
 
+  participants: {
+    list: (published?: boolean) =>
+      request<Participant[]>(`/participants${published !== undefined ? `?published=${published}` : ''}`),
+    get: (id: string) => request<Participant>(`/participants/${id}`),
+    create: (data: Partial<Participant>) =>
+      request<Participant>('/participants', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: Partial<Participant>) =>
+      request<Participant>(`/participants/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    togglePublish: (id: string, is_published: boolean) =>
+      request<Participant>(`/participants/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+    delete: (id: string) =>
+      request<{ success: boolean }>(`/participants/${id}`, { method: 'DELETE' }),
+  },
+
   leads: {
     exhibition: () => request<ExhibitionLead[]>('/leads/exhibition'),
     speakers: () => request<SpeakerLead[]>('/leads/speakers'),
     sponsors: () => request<SponsorLead[]>('/leads/sponsors'),
+    tickets: () => request<TicketLead[]>('/leads/tickets'),
     stats: () => request<LeadStats>('/leads/stats'),
     submitExhibition: (data: Partial<ExhibitionLead>) =>
       request<ExhibitionLead>('/leads/exhibition', { method: 'POST', body: JSON.stringify(data) }),
@@ -162,6 +202,8 @@ export const api = {
       request<SpeakerLead>('/leads/speakers', { method: 'POST', body: JSON.stringify(data) }),
     submitSponsor: (data: Partial<SponsorLead>) =>
       request<SponsorLead>('/leads/sponsors', { method: 'POST', body: JSON.stringify(data) }),
+    submitTicket: (data: Partial<TicketLead>) =>
+      request<TicketLead>('/leads/tickets', { method: 'POST', body: JSON.stringify(data) }),
   },
 
   settings: {

@@ -3,10 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, LayoutDashboard, Mic2, Radio, Handshake, FileImage, Mail, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, Mic2, Radio, Handshake, Users, FileImage, Mail, Settings } from "lucide-react";
 import { SpeakersManager } from "./SpeakersManager";
 import { StreamsManager } from "./StreamsManager";
 import { SponsorsManager } from "./SponsorsManager";
+import { ParticipantsManager } from "./ParticipantsManager";
 import { LeadsManager } from "./LeadsManager";
 import { MediaUploader } from "./MediaUploader";
 import { SiteSettingsManager } from "./SiteSettingsManager";
@@ -105,6 +106,9 @@ export function AdminPanel() {
             <TabsTrigger value="sponsors" className="gap-2">
               <Handshake className="w-4 h-4" /> Спонсоры
             </TabsTrigger>
+            <TabsTrigger value="participants" className="gap-2">
+              <Users className="w-4 h-4" /> Участники
+            </TabsTrigger>
             <TabsTrigger value="media" className="gap-2">
               <FileImage className="w-4 h-4" /> Медиа
             </TabsTrigger>
@@ -117,7 +121,7 @@ export function AdminPanel() {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm text-muted-foreground">Заявки на выставку</CardTitle>
@@ -142,6 +146,14 @@ export function AdminPanel() {
                   <p className="text-3xl font-bold">{stats.sponsors}</p>
                 </CardContent>
               </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-muted-foreground">Заявки на билеты</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold">{stats.tickets || 0}</p>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
@@ -155,6 +167,10 @@ export function AdminPanel() {
 
           <TabsContent value="sponsors">
             <SponsorsManager />
+          </TabsContent>
+
+          <TabsContent value="participants">
+            <ParticipantsManager />
           </TabsContent>
 
           <TabsContent value="media">

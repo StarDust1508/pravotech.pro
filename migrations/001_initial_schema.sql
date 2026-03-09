@@ -96,6 +96,18 @@ CREATE TABLE sponsor_leads (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Ticket leads (заявки на покупку билетов)
+CREATE TABLE ticket_leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  full_name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(50) NOT NULL,
+  ticket_type VARCHAR(100) NOT NULL,
+  ticket_price VARCHAR(50),
+  payment_method VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Site settings (настройки сайта)
 CREATE TABLE site_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
