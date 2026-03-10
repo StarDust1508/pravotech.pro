@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-image.jpg";
+import { BrandTitle } from "@/components/BrandTitle";
 
 export const HeroSection = () => {
   const scrollToSection = (href: string) => {
@@ -114,9 +115,7 @@ export const HeroSection = () => {
           </div>
 
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-2">
-            <span className="text-neon-cyan">Технологии</span>
-            <br />
-            <span className="text-neon-magenta">ПРАВА</span>
+            <BrandTitle className="leading-tight" lineBreakBeforeLaw />
           </h1>
 
           <p className="font-display text-lg md:text-xl font-bold text-foreground/90 mb-4 uppercase tracking-wide">

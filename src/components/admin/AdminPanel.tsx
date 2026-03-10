@@ -11,6 +11,7 @@ import { ParticipantsManager } from "./ParticipantsManager";
 import { LeadsManager } from "./LeadsManager";
 import { MediaUploader } from "./MediaUploader";
 import { SiteSettingsManager } from "./SiteSettingsManager";
+import { BrandTitle } from "@/components/BrandTitle";
 import { api } from "@/lib/api";
 import type { LeadStats } from "@/lib/api";
 
@@ -83,7 +84,7 @@ export function AdminPanel() {
       <div className="border-b border-border bg-card">
         <div className="container flex items-center justify-between h-14">
           <h1 className="font-display font-bold text-lg">
-            <span className="text-neon-cyan">ТЕХНОЛОГИИ ПРАВА</span> — Админ
+            <BrandTitle uppercase /> — Админ
           </h1>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="w-4 h-4 mr-2" /> Выйти

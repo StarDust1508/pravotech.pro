@@ -1,11 +1,12 @@
+import { BrandTitle } from "@/components/BrandTitle";
+
 export const Footer = () => {
   return (
     <footer className="py-12 border-t border-border">
       <div className="container">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <span className="font-display text-lg font-bold text-neon-cyan">ТЕХНОЛОГИИ</span>
-            <span className="font-display text-lg font-bold text-neon-magenta">ПРАВА</span>
+            <BrandTitle className="font-display text-lg font-bold" uppercase />
             <p className="text-muted-foreground text-sm mt-1">Технологии в сфере права • 2026</p>
           </div>
           <div className="flex gap-8 text-sm text-muted-foreground">

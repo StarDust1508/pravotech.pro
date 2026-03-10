@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { BrandTitle } from "@/components/BrandTitle";
 
 const navItems = [
 { label: "Потоки", href: "#streams" },
@@ -25,8 +26,8 @@ export const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container flex items-center justify-between h-16">
-        <a href="#" className="font-display text-lg font-bold text-neon-cyan">
-          ТЕХНОЛОГИИ <span className="text-neon-magenta">ПРАВА</span>
+        <a href="#" className="font-display text-lg font-bold">
+          <BrandTitle uppercase />
         </a>
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) =>
