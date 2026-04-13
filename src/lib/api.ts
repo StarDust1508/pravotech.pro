@@ -113,18 +113,103 @@ export interface Media {
   created_at: string;
 }
 
+export interface AcademyCourse {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  hero_title: string;
+  hero_subtitle: string;
+  hero_description: string;
+  price: string;
+  level: string;
+  display_order: number;
+  is_published: boolean;
+  target_audience: string[];
+  lessons: { title: string; points: string[] }[];
+  selling_points: string[];
+  faq_items: { question: string; answer: string }[];
+  team_order: string[];
+  learning_results: string[];
+  program_features: string[];
+  materials_includes: string[];
+  practice_tasks: string[];
+  program_badge: string;
+  program_format_title: string;
+  program_format_description: string;
+  special_offer_title: string;
+  special_offer_description: string;
+  special_offer_badge: string;
+  special_offer_button_text: string;
+  cta_title: string;
+  cta_description: string;
+  cta_button_text: string;
+  intro_title: string;
+  intro_description: string;
+  download_form_banner_url: string;
+  download_form_file_url: string;
+  download_form_title: string;
+  download_form_description: string;
+  cover_image_url: string;
+}
+
+export interface AcademyTeacher {
+  id: string;
+  full_name: string;
+  position: string;
+  bio: string;
+  expertise: string;
+  experience: string;
+  photo_url: string;
+  display_order: number;
+  is_published: boolean;
+}
+
+export interface AcademyReview {
+  id: string;
+  course_id: string;
+  rating: number;
+  comment: string;
+  author_name: string;
+  author_avatar_url: string;
+  review_image_url: string;
+  review_video_url: string;
+  is_published: boolean;
+  created_at: string;
+}
+
+export interface ResearchLead {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  telegram: string;
+  company: string;
+  position: string;
+  research_id: string;
+  research_title: string;
+  source_form: string;
+  created_at: string;
+}
+
 export interface LeadStats {
   exhibition: number;
   speakers: number;
   sponsors: number;
   tickets: number;
+  research: number;
 }
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('admin_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders(), ...options?.headers },
     ...options,
   });
 
@@ -137,6 +222,15 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  auth: {
+    login: (password: string) =>
+      request<{ token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ password }) }),
+    verify: () =>
+      request<{ valid: boolean }>('/auth/verify'),
+    logout: () =>
+      request<{ success: boolean }>('/auth/logout', { method: 'POST' }),
+  },
+
   speakers: {
     list: (published?: boolean) =>
       request<Speaker[]>(`/speakers${published !== undefined ? `?published=${published}` : ''}`),
@@ -204,6 +298,9 @@ export const api = {
       request<SponsorLead>('/leads/sponsors', { method: 'POST', body: JSON.stringify(data) }),
     submitTicket: (data: Partial<TicketLead>) =>
       request<TicketLead>('/leads/tickets', { method: 'POST', body: JSON.stringify(data) }),
+    research: () => request<ResearchLead[]>('/leads/research'),
+    submitResearch: (data: Partial<ResearchLead>) =>
+      request<ResearchLead>('/leads/research', { method: 'POST', body: JSON.stringify(data) }),
   },
 
   settings: {
@@ -236,5 +333,47 @@ export const api = {
     },
     delete: (id: string) =>
       request<{ success: boolean }>(`/media/${id}`, { method: 'DELETE' }),
+  },
+
+  academy: {
+    courses: (all?: boolean) => request<AcademyCourse[]>(`/academy/courses${all ? '?all=true' : ''}`),
+    course: (slug: string) => request<AcademyCourse>(`/academy/courses/${slug}`),
+    createCourse: (data: Partial<AcademyCourse>) =>
+      request<AcademyCourse>('/academy/courses', { method: 'POST', body: JSON.stringify(data) }),
+    updateCourse: (id: string, data: Partial<AcademyCourse>) =>
+      request<AcademyCourse>(`/academy/courses/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteCourse: (id: string) =>
+      request<{ success: boolean }>(`/academy/courses/${id}`, { method: 'DELETE' }),
+    toggleCoursePublish: (id: string, is_published: boolean) =>
+      request<AcademyCourse>(`/academy/courses/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+
+    teachers: (all?: boolean) => request<AcademyTeacher[]>(`/academy/teachers${all ? '?all=true' : ''}`),
+    createTeacher: (data: Partial<AcademyTeacher>) =>
+      request<AcademyTeacher>('/academy/teachers', { method: 'POST', body: JSON.stringify(data) }),
+    updateTeacher: (id: string, data: Partial<AcademyTeacher>) =>
+      request<AcademyTeacher>(`/academy/teachers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteTeacher: (id: string) =>
+      request<{ success: boolean }>(`/academy/teachers/${id}`, { method: 'DELETE' }),
+    toggleTeacherPublish: (id: string, is_published: boolean) =>
+      request<AcademyTeacher>(`/academy/teachers/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+
+    reviews: (courseId?: string, all?: boolean) => {
+      const params = new URLSearchParams();
+      if (courseId) params.set('course_id', courseId);
+      if (all) params.set('all', 'true');
+      const qs = params.toString();
+      return request<AcademyReview[]>(`/academy/reviews${qs ? '?' + qs : ''}`);
+    },
+    createReview: (data: Partial<AcademyReview>) =>
+      request<AcademyReview>('/academy/reviews', { method: 'POST', body: JSON.stringify(data) }),
+    updateReview: (id: string, data: Partial<AcademyReview>) =>
+      request<AcademyReview>(`/academy/reviews/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteReview: (id: string) =>
+      request<{ success: boolean }>(`/academy/reviews/${id}`, { method: 'DELETE' }),
+    toggleReviewPublish: (id: string, is_published: boolean) =>
+      request<AcademyReview>(`/academy/reviews/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+
+    register: (data: { name: string; phone: string; email: string; course_id?: string; course_title?: string }) =>
+      request('/academy/register', { method: 'POST', body: JSON.stringify(data) }),
   },
 };

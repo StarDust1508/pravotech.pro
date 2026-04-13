@@ -1,14 +1,10 @@
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { TickerBar } from "@/components/TickerBar";
-import { StreamsSection } from "@/components/StreamsSection";
-import { SpeakersSection } from "@/components/SpeakersSection";
-import { ParticipantsSection } from "@/components/ParticipantsSection";
-import { TicketsSection } from "@/components/TicketsSection";
-import { ExhibitionForm } from "@/components/ExhibitionForm";
-import { SponsorForm } from "@/components/SponsorForm";
-import WhyPartnerSection from "@/components/WhyPartnerSection";
-import { SpeakerForm } from "@/components/SpeakerForm";
+import { AboutProjectSection } from "@/components/AboutProjectSection";
+import { ResearchSection } from "@/components/ResearchSection";
+import { AcademySection } from "@/components/AcademySection";
+import { ConferenceTeaserSection } from "@/components/ConferenceTeaserSection";
 import { Footer } from "@/components/Footer";
 
 const Index = () => {
@@ -17,14 +13,10 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <TickerBar />
-      <StreamsSection />
-      <SpeakersSection />
-      <ParticipantsSection />
-      <TicketsSection />
-      <ExhibitionForm />
-      <SponsorForm />
-      <WhyPartnerSection />
-      <SpeakerForm />
+      <AboutProjectSection />
+      <ResearchSection />
+      <AcademySection />
+      <ConferenceTeaserSection />
       <Footer />
     </div>
   );

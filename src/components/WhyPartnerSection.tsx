@@ -22,10 +22,10 @@ export default function WhyPartnerSection() {
           className="text-center mb-16"
         >
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-neon-cyan via-neon-magenta to-neon-cyan bg-clip-text text-transparent">
-            Почему PravoTechHub?
+            Почему ТехнологИИ права?
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Крупнейшая IT-конференция в сфере правовых технологий с доказанной эффективностью
+            Крупнейшая платформа о технологиях и ИИ в юридическом бизнесе с доказанной эффективностью
           </p>
         </motion.div>
 
@@ -37,8 +37,8 @@ export default function WhyPartnerSection() {
             transition={{ delay: 0.1 }}
             className="text-center group"
           >
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-neon-cyan to-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <span className="text-3xl font-bold text-primary-foreground">5K+</span>
+            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-5xl font-display font-black text-neon-cyan">5K+</span>
             </div>
             <h3 className="text-xl font-display font-bold mb-2">Участников</h3>
             <p className="text-sm text-muted-foreground">Ежегодная аудитория конференции</p>
@@ -51,8 +51,8 @@ export default function WhyPartnerSection() {
             transition={{ delay: 0.2 }}
             className="text-center group"
           >
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-neon-magenta to-purple-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <span className="text-3xl font-bold text-primary-foreground">85%</span>
+            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-5xl font-display font-black text-neon-magenta">85%</span>
             </div>
             <h3 className="text-xl font-display font-bold mb-2">C-Level</h3>
             <p className="text-sm text-muted-foreground">Топ-менеджеры и владельцы бизнеса</p>
@@ -65,8 +65,8 @@ export default function WhyPartnerSection() {
             transition={{ delay: 0.3 }}
             className="text-center group"
           >
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <span className="text-3xl font-bold text-primary-foreground">320%</span>
+            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-5xl font-display font-black text-green-500">320%</span>
             </div>
             <h3 className="text-xl font-display font-bold mb-2">Средний ROI</h3>
             <p className="text-sm text-muted-foreground">Возврат инвестиций партнеров</p>
@@ -79,8 +79,8 @@ export default function WhyPartnerSection() {
             transition={{ delay: 0.4 }}
             className="text-center group"
           >
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <span className="text-3xl font-bold text-primary-foreground">150+</span>
+            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-5xl font-display font-black text-orange-500">150+</span>
             </div>
             <h3 className="text-xl font-display font-bold mb-2">Лидов</h3>
             <p className="text-sm text-muted-foreground">Качественных контактов на спонсора</p>
@@ -143,7 +143,7 @@ export default function WhyPartnerSection() {
               </div>
             </div>
             <blockquote className="text-center italic text-muted-foreground mb-4">
-              "PravoTechHub превзошел все наши ожидания. За 2 дня мы получили 180 качественных лидов и заключили 3 крупные сделки. ROI составил 420%."
+              "«ТехнологИИ права» превзошел все наши ожидания. За 2 дня мы получили 180 качественных лидов и заключили 3 крупные сделки. ROI составил 420%."
             </blockquote>
             <div className="text-center">
               <p className="font-semibold">Алексей Петров</p>

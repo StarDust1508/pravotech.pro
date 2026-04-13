@@ -1,213 +1,197 @@
-import type { ReactNode } from "react";
+import { useState } from "react";
+import { X } from "lucide-react";
 import { BrandTitle } from "@/components/BrandTitle";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
-type LegalDialogLinkProps = {
-  title: string;
-  description: string;
-  children: ReactNode;
+type DocKey = "privacy" | "cookie" | "terms" | "consent";
+
+const docs: Record<DocKey, { title: string; content: string }> = {
+  privacy: {
+    title: "Политика конфиденциальности",
+    content: `1. Общие положения
+
+1.1. Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных пользователей сайта «ТехнологИИ права» (далее — Сайт).
+
+1.2. Оператором персональных данных является ООО «ТехнологИИ права» (далее — Оператор).
+
+1.3. Политика разработана в соответствии с Федеральным законом от 27.07.2006 №152-ФЗ «О персональных данных».
+
+2. Цели обработки персональных данных
+
+2.1. Оператор обрабатывает персональные данные в следующих целях:
+— предоставление доступа к материалам и исследованиям Сайта;
+— обработка заявок на участие в конференции и иных мероприятиях;
+— обработка заявок на партнёрство и спонсорство;
+— направление информационных рассылок (с согласия Пользователя);
+— улучшение качества работы Сайта;
+— выполнение требований законодательства РФ.
+
+3. Перечень обрабатываемых данных
+
+3.1. Оператор может обрабатывать: ФИО, email, телефон, наименование организации и должность, Telegram, данные об использовании Сайта (IP-адрес, тип браузера — обезличенные данные).
+
+4. Правовые основания обработки
+
+4.1. Обработка осуществляется на основании согласия субъекта (ст. 6 ч. 1 п. 1 №152-ФЗ), исполнения договора (ст. 6 ч. 1 п. 5), законного интереса Оператора (ст. 6 ч. 1 п. 7).
+
+5. Порядок обработки
+
+5.1. Обработка включает сбор, запись, систематизацию, хранение, уточнение, использование, передачу, обезличивание, блокирование, удаление и уничтожение данных.
+
+5.2. Оператор обеспечивает конфиденциальность и принимает меры для предотвращения несанкционированного доступа.
+
+6. Сроки обработки
+
+6.1. Данные хранятся не дольше, чем требуют цели обработки. По запросу субъекта уничтожаются в срок не более 30 дней.
+
+7. Права субъекта
+
+7.1. Пользователь вправе запросить уточнение, блокирование или удаление данных, отозвать согласие на обработку. Обращения: info@pravotechhub.ru.
+
+8. Меры защиты
+
+8.1. Шифрование (SSL/TLS), ограничение доступа, обновление средств защиты, резервное копирование.
+
+9. Актуальная версия Политики размещается на Сайте. Контакт: info@pravotechhub.ru.`,
+  },
+
+  cookie: {
+    title: "Политика использования файлов cookie",
+    content: `1. Файлы cookie — небольшие текстовые файлы, сохраняемые на устройстве при посещении сайта «ТехнологИИ права».
+
+2. Типы cookie:
+— Необходимые (технические) — базовая работа Сайта.
+— Аналитические — обезличенные данные о взаимодействии (Яндекс.Метрика, Google Analytics).
+— Функциональные — запоминание предпочтений.
+— Маркетинговые — релевантная реклама.
+
+3. Сроки: сессионные удаляются при закрытии браузера, постоянные — от 30 дней до 2 лет.
+
+4. Управление: через настройки браузера. Отключение может ограничить функциональность.
+
+5. Продолжая использовать Сайт, вы соглашаетесь с использованием cookie.
+
+6. Контакт: info@pravotechhub.ru.`,
+  },
+
+  terms: {
+    title: "Пользовательское соглашение",
+    content: `1. Настоящее Соглашение регулирует отношения между ООО «ТехнологИИ права» и пользователем сайта pravotechhub.ru.
+
+2. Использование Сайта означает принятие условий Соглашения. Администрация вправе изменять условия.
+
+3. Пользователь обязуется: использовать Сайт в соответствии с законодательством РФ, не нарушать работу Сайта, не копировать материалы без разрешения, предоставлять достоверные данные.
+
+4. Все материалы Сайта являются интеллектуальной собственностью Администрации. Цитирование допускается со ссылкой на источник.
+
+5. Сайт предоставляется «как есть». Администрация не несёт ответственности за убытки от использования Сайта. Исследования носят информационный характер.
+
+6. Споры разрешаются по законодательству РФ. Контакт: info@pravotechhub.ru.`,
+  },
+
+  consent: {
+    title: "Согласие на обработку персональных данных",
+    content: `В соответствии со ст. 9 ФЗ от 27.07.2006 №152-ФЗ «О персональных данных», даю согласие ООО «ТехнологИИ права» на обработку моих данных:
+
+1. Данные: ФИО, email, телефон, организация, должность, Telegram.
+
+2. Цели: доступ к исследованиям, обработка заявок на конференцию/партнёрство/спикерство, информирование о новых материалах.
+
+3. Способы: сбор, запись, систематизация, хранение, уточнение, использование, передача, обезличивание, удаление. С использованием и без средств автоматизации.
+
+4. Срок: до момента отзыва.
+
+5. Отзыв: письменное заявление на info@pravotechhub.ru. Данные уничтожаются в срок не более 30 дней.
+
+6. Оператор вправе передавать данные третьим лицам для достижения целей обработки с соблюдением законодательства РФ.
+
+7. Заполняя форму на сайте, Пользователь подтверждает ознакомление с настоящим согласием и Политикой конфиденциальности.
+
+Контакт: info@pravotechhub.ru | +7 (495) 123-45-67`,
+  },
 };
 
-const LegalDialogLink = ({ title, description, children }: LegalDialogLinkProps) => (
-  <Dialog>
-    <DialogTrigger asChild>
-      <button
-        type="button"
-        className="text-sm text-muted-foreground transition-colors hover:text-neon-cyan"
-      >
-        {title}
-      </button>
-    </DialogTrigger>
-    <DialogContent className="max-h-[85vh] max-w-3xl overflow-hidden border-border bg-card p-0">
-      <div className="custom-scrollbar max-h-[85vh] overflow-y-auto p-6 sm:p-8">
-        <DialogHeader className="mb-6 text-left">
-          <DialogTitle className="font-display text-xl text-foreground">{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        <div className="space-y-5 text-sm leading-6 text-muted-foreground">{children}</div>
-      </div>
-    </DialogContent>
-  </Dialog>
-);
-
 export const Footer = () => {
-  return (
-    <footer className="border-t border-border py-12">
-      <div className="container">
-        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-          <div>
-            <BrandTitle className="font-display text-lg font-bold" uppercase />
-            <p className="mt-1 text-sm text-muted-foreground">Технологии в сфере права • 2026</p>
-          </div>
+  const [openDoc, setOpenDoc] = useState<DocKey | null>(null);
 
-          <div className="flex gap-8 text-sm text-muted-foreground">
-            <a href="#streams" className="transition-colors hover:text-neon-cyan">
-              Потоки
-            </a>
-            <a href="#exhibition" className="transition-colors hover:text-neon-cyan">
-              Выставка
-            </a>
-            <a href="#sponsors" className="transition-colors hover:text-neon-cyan">
-              Спонсорам
-            </a>
-            <a href="#become-speaker" className="transition-colors hover:text-neon-cyan">
-              Спикерам
-            </a>
+  const scrollToSection = (href: string) => {
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <>
+      <footer id="contacts" className="py-12 border-t border-border">
+        <div className="container">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <BrandTitle className="font-display text-lg font-bold" uppercase />
+              <p className="text-muted-foreground text-sm mt-2 max-w-xs">
+                Платформа об ИИ, цифровых технологиях и масштабировании юридического бизнеса в сфере БФЛ.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-sm uppercase mb-3 text-foreground/80">Разделы</h4>
+              <div className="space-y-2">
+                <button onClick={() => scrollToSection("#about")} className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">О проекте</button>
+                <button onClick={() => scrollToSection("#research")} className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Исследования</button>
+                <button onClick={() => scrollToSection("#academy")} className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Академия</button>
+                <button onClick={() => scrollToSection("#conference")} className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Конференция</button>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-sm uppercase mb-3 text-foreground/80">Контакты</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>info@pravotechhub.ru</p>
+                <p>+7 (495) 123-45-67</p>
+                <p>Москва, Россия</p>
+              </div>
+            </div>
+          </div>
+          <div className="pt-6 border-t border-border">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4 text-xs text-muted-foreground">
+              <button onClick={() => setOpenDoc("privacy")} className="hover:text-neon-cyan transition-colors">Политика конфиденциальности</button>
+              <button onClick={() => setOpenDoc("cookie")} className="hover:text-neon-cyan transition-colors">Политика использования cookies</button>
+              <button onClick={() => setOpenDoc("terms")} className="hover:text-neon-cyan transition-colors">Пользовательское соглашение</button>
+              <button onClick={() => setOpenDoc("consent")} className="hover:text-neon-cyan transition-colors">Согласие на обработку ПДн</button>
+            </div>
+            <p className="text-center text-xs text-muted-foreground mb-1">
+              &copy; 2026 ТехнологИИ права. Все права защищены.
+            </p>
+            <p className="text-center text-[11px] text-muted-foreground/60">
+              Оставляя свои данные на сайте, вы даёте согласие на обработку персональных данных в соответствии с Федеральным законом №152-ФЗ «О персональных данных» и подтверждаете ознакомление с политикой конфиденциальности.
+            </p>
           </div>
         </div>
+      </footer>
 
-        <div className="mt-8 border-t border-border pt-6">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-center text-xs text-muted-foreground md:text-left">
-              © 2026 LegalTech Conference. Все права защищены.
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <LegalDialogLink
-                title="Обработка ПД"
-                description="Сведения о порядке обработки персональных данных пользователей сайта."
+      {openDoc && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setOpenDoc(null)} />
+          <div className="relative bg-card border border-border rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
+              <h3 className="font-display text-xl font-bold">{docs[openDoc].title}</h3>
+              <button onClick={() => setOpenDoc(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scrollbar">
+              <div className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+                {docs[openDoc].content}
+              </div>
+            </div>
+            <div className="p-4 border-t border-border">
+              <button
+                onClick={() => setOpenDoc(null)}
+                className="w-full px-6 py-2.5 border border-border text-foreground/70 font-display font-bold rounded-lg hover:border-neon-cyan/50 transition-colors text-sm uppercase tracking-wider"
               >
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">1. Общие положения</h3>
-                  <p>
-                    Настоящее уведомление определяет порядок обработки персональных данных,
-                    передаваемых пользователями сайта конференции LegalTech Conference при
-                    заполнении форм обратной связи, заявок на участие, партнерство и выступление.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">2. Какие данные обрабатываются</h3>
-                  <p>
-                    Оператор может обрабатывать фамилию, имя, отчество, адрес электронной почты,
-                    номер телефона, должность, название компании, сведения о профессиональной
-                    деятельности, а также иные данные, которые пользователь добровольно указывает в
-                    форме на сайте.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">3. Цели обработки</h3>
-                  <p>
-                    Персональные данные используются для обработки заявок, обратной связи с
-                    пользователем, организации участия в мероприятии, рассмотрения партнерских и
-                    спикерских предложений, а также для исполнения требований законодательства.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">4. Правовые основания</h3>
-                  <p>
-                    Обработка осуществляется на основании согласия субъекта персональных данных, а
-                    также в случаях, предусмотренных действующим законодательством Российской
-                    Федерации.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">5. Действия с данными</h3>
-                  <p>
-                    Оператор вправе собирать, записывать, систематизировать, хранить, уточнять,
-                    использовать, передавать в пределах, необходимых для достижения указанных целей,
-                    блокировать и удалять персональные данные в соответствии с законодательством.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">6. Срок хранения</h3>
-                  <p>
-                    Персональные данные хранятся не дольше, чем этого требуют цели обработки или
-                    нормы законодательства, после чего подлежат удалению либо обезличиванию.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">7. Права пользователя</h3>
-                  <p>
-                    Пользователь вправе запросить уточнение, блокирование или удаление своих
-                    персональных данных, а также отозвать согласие на их обработку, направив
-                    обращение по контактам организатора, указанным на сайте.
-                  </p>
-                </section>
-              </LegalDialogLink>
-
-              <LegalDialogLink
-                title="Политика конфиденциальности"
-                description="Информация о сборе, использовании и защите данных пользователей сайта."
-              >
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">1. Назначение политики</h3>
-                  <p>
-                    Политика конфиденциальности регулирует порядок получения, использования и защиты
-                    информации, которую сайт получает от посетителей при использовании страниц,
-                    сервисов и форм сайта.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">2. Источники данных</h3>
-                  <p>
-                    Информация поступает непосредственно от пользователя при заполнении форм, а
-                    также автоматически в ограниченном объеме через технические журналы сервера,
-                    cookie и иные средства аналитики, если они используются на сайте.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">3. Использование информации</h3>
-                  <p>
-                    Полученные данные используются для обеспечения работы сайта, связи с
-                    пользователями, улучшения качества сервиса, подготовки предложений об участии в
-                    мероприятии и соблюдения обязательных требований законодательства.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">4. Передача третьим лицам</h3>
-                  <p>
-                    Данные не передаются третьим лицам без законных оснований или согласия
-                    пользователя, за исключением случаев, когда такая передача необходима для
-                    исполнения закона, защиты прав оператора или организации мероприятия.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">5. Защита информации</h3>
-                  <p>
-                    Оператор принимает разумные организационные и технические меры для защиты данных
-                    от утраты, неправомерного доступа, изменения, раскрытия или уничтожения.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">6. Cookie и технические данные</h3>
-                  <p>
-                    Сайт может использовать cookie и иные технические средства для корректной работы
-                    интерфейсов, сохранения пользовательских настроек и анализа посещаемости. При
-                    необходимости пользователь может ограничить использование cookie в настройках
-                    браузера.
-                  </p>
-                </section>
-
-                <section className="space-y-2">
-                  <h3 className="font-display text-base text-foreground">7. Изменение политики</h3>
-                  <p>
-                    Оператор вправе обновлять настоящую политику. Актуальная версия размещается на
-                    сайте и применяется с момента публикации.
-                  </p>
-                </section>
-              </LegalDialogLink>
+                Закрыть
+              </button>
             </div>
           </div>
         </div>
-      </div>
-    </footer>
+      )}
+    </>
   );
 };

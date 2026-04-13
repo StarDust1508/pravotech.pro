@@ -12,6 +12,8 @@ import participantsRouter from './routes/participants.js';
 import leadsRouter from './routes/leads.js';
 import settingsRouter from './routes/settings.js';
 import mediaRouter from './routes/media.js';
+import academyRouter from './routes/academy.js';
+import authRouter from './routes/auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
@@ -32,6 +34,8 @@ app.use('/api/participants', participantsRouter);
 app.use('/api/leads', leadsRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/media', mediaRouter);
+app.use('/api/academy', academyRouter);
+app.use('/api/auth', authRouter);
 
 app.get('/api/health', async (_req, res) => {
   const dbOk = await testConnection();

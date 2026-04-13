@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, LayoutDashboard, Mic2, Radio, Handshake, Users, FileImage, Mail, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, Mic2, Radio, Handshake, Users, FileImage, Mail, Settings, GraduationCap, UserCheck, MessageSquare } from "lucide-react";
 import { SpeakersManager } from "./SpeakersManager";
 import { StreamsManager } from "./StreamsManager";
 import { SponsorsManager } from "./SponsorsManager";
@@ -11,32 +11,56 @@ import { ParticipantsManager } from "./ParticipantsManager";
 import { LeadsManager } from "./LeadsManager";
 import { MediaUploader } from "./MediaUploader";
 import { SiteSettingsManager } from "./SiteSettingsManager";
+import { AcademyCoursesManager } from "./AcademyCoursesManager";
+import { AcademyTeachersManager } from "./AcademyTeachersManager";
+import { AcademyReviewsManager } from "./AcademyReviewsManager";
 import { BrandTitle } from "@/components/BrandTitle";
 import { api } from "@/lib/api";
 import type { LeadStats } from "@/lib/api";
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem("admin_authenticated") === "true";
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [stats, setStats] = useState<LeadStats>({ exhibition: 0, speakers: 0, sponsors: 0 });
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [stats, setStats] = useState<LeadStats>({ exhibition: 0, speakers: 0, sponsors: 0, tickets: 0, research: 0 });
 
-  const handleLogin = () => {
-    const adminPassword = "279286";
-    if (password === adminPassword) {
-      localStorage.setItem("admin_authenticated", "true");
-      setIsAuthenticated(true);
-      setLoginError("");
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    if (token) {
+      api.auth.verify()
+        .then(() => setIsAuthenticated(true))
+        .catch(() => {
+          localStorage.removeItem("admin_token");
+          setIsAuthenticated(false);
+        })
+        .finally(() => setAuthChecked(true));
     } else {
+      setAuthChecked(true);
+    }
+  }, []);
+
+  const handleLogin = async () => {
+    setLoginLoading(true);
+    setLoginError("");
+    try {
+      const { token } = await api.auth.login(password);
+      localStorage.setItem("admin_token", token);
+      setIsAuthenticated(true);
+    } catch {
       setLoginError("Неверный пароль");
+    } finally {
+      setLoginLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin_authenticated");
+  const handleLogout = async () => {
+    try {
+      await api.auth.logout();
+    } catch { /* ignore */ }
+    localStorage.removeItem("admin_token");
     setIsAuthenticated(false);
     setPassword("");
   };
@@ -46,6 +70,14 @@ export function AdminPanel() {
       api.leads.stats().then(setStats).catch(() => {});
     }
   }, [isAuthenticated]);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Проверка авторизации...</p>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -67,10 +99,11 @@ export function AdminPanel() {
                 placeholder="Пароль"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loginLoading}
               />
               {loginError && <p className="text-sm text-red-500">{loginError}</p>}
-              <Button type="submit" className="w-full">
-                Войти
+              <Button type="submit" className="w-full" disabled={loginLoading}>
+                {loginLoading ? "Вход..." : "Войти"}
               </Button>
             </form>
           </CardContent>
@@ -118,6 +151,15 @@ export function AdminPanel() {
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" /> Настройки
+            </TabsTrigger>
+            <TabsTrigger value="academy-courses" className="gap-2">
+              <GraduationCap className="w-4 h-4" /> Курсы
+            </TabsTrigger>
+            <TabsTrigger value="academy-teachers" className="gap-2">
+              <UserCheck className="w-4 h-4" /> Преподаватели
+            </TabsTrigger>
+            <TabsTrigger value="academy-reviews" className="gap-2">
+              <MessageSquare className="w-4 h-4" /> Отзывы
             </TabsTrigger>
           </TabsList>
 
@@ -184,6 +226,18 @@ export function AdminPanel() {
 
           <TabsContent value="settings">
             <SiteSettingsManager />
+          </TabsContent>
+
+          <TabsContent value="academy-courses">
+            <AcademyCoursesManager />
+          </TabsContent>
+
+          <TabsContent value="academy-teachers">
+            <AcademyTeachersManager />
+          </TabsContent>
+
+          <TabsContent value="academy-reviews">
+            <AcademyReviewsManager />
           </TabsContent>
         </Tabs>
       </div>

@@ -18,7 +18,7 @@ export const BrandTitle = ({
       <span className="text-neon-cyan">{techPrefix}</span>
       <span className="text-neon-magenta">{techSuffix}</span>
       {lineBreakBeforeLaw ? <br /> : " "}
-      <span className="text-neon-magenta">{law}</span>
+      <span className="text-neon-cyan">{law}</span>
     </span>
   );
 };

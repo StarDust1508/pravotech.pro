@@ -100,6 +100,31 @@ router.post('/tickets', async (req, res) => {
   }
 });
 
+// GET research leads
+router.get('/research', async (_req, res) => {
+  try {
+    const result = await query('SELECT * FROM research_leads ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch research leads' });
+  }
+});
+
+// POST research lead
+router.post('/research', async (req, res) => {
+  try {
+    const { name, email, phone, telegram, company, position, research_id, research_title, source_form } = req.body;
+    const result = await query(
+      `INSERT INTO research_leads (name, email, phone, telegram, company, position, research_id, research_title, source_form)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [name, email, phone, telegram || null, company || null, position || null, research_id, research_title || null, source_form || 'research_card']
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create research lead' });
+  }
+});
+
 // GET stats for dashboard
 router.get('/stats', async (_req, res) => {
   try {
@@ -107,11 +132,13 @@ router.get('/stats', async (_req, res) => {
     const speakers = await query('SELECT COUNT(*) as count FROM speaker_leads');
     const sponsors = await query('SELECT COUNT(*) as count FROM sponsor_leads');
     const tickets = await query('SELECT COUNT(*) as count FROM ticket_leads');
+    const research = await query('SELECT COUNT(*) as count FROM research_leads');
     res.json({
       exhibition: parseInt(exhibition.rows[0].count),
       speakers: parseInt(speakers.rows[0].count),
       sponsors: parseInt(sponsors.rows[0].count),
       tickets: parseInt(tickets.rows[0].count),
+      research: parseInt(research.rows[0].count),
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch stats' });

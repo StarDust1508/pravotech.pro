@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
-import type { ExhibitionLead, SpeakerLead, SponsorLead, TicketLead } from "@/lib/api";
+import type { ExhibitionLead, SpeakerLead, SponsorLead, TicketLead, ResearchLead } from "@/lib/api";
 
 export function LeadsManager() {
   const { toast } = useToast();
@@ -12,6 +12,7 @@ export function LeadsManager() {
   const [speakerLeads, setSpeakerLeads] = useState<SpeakerLead[]>([]);
   const [sponsorLeads, setSponsorLeads] = useState<SponsorLead[]>([]);
   const [ticketLeads, setTicketLeads] = useState<TicketLead[]>([]);
+  const [researchLeads, setResearchLeads] = useState<ResearchLead[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -19,16 +20,18 @@ export function LeadsManager() {
     const load = async () => {
       try {
         setLoading(true);
-        const [ex, sp, sn, tk] = await Promise.all([
+        const [ex, sp, sn, tk, rs] = await Promise.all([
           api.leads.exhibition(),
           api.leads.speakers(),
           api.leads.sponsors(),
           api.leads.tickets(),
+          api.leads.research(),
         ]);
         setExhibitionLeads(ex);
         setSpeakerLeads(sp);
         setSponsorLeads(sn);
         setTicketLeads(tk);
+        setResearchLeads(rs);
       } catch {
         toast({ title: "Ошибка загрузки заявок", variant: "destructive" });
       } finally {
@@ -56,6 +59,8 @@ export function LeadsManager() {
           <TabsTrigger value="speakers">Спикеры ({speakerLeads.length})</TabsTrigger>
           <TabsTrigger value="sponsors">Спонсоры ({sponsorLeads.length})</TabsTrigger>
           <TabsTrigger value="tickets">Билеты ({ticketLeads.length})</TabsTrigger>
+          <TabsTrigger value="research">Исследования ({researchLeads.filter(l => l.source_form !== 'academy_course').length})</TabsTrigger>
+          <TabsTrigger value="academy">Академия ({researchLeads.filter(l => l.source_form === 'academy_course').length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="exhibition" className="space-y-3 mt-4">
@@ -141,6 +146,50 @@ export function LeadsManager() {
               </Card>
             ))}
           {ticketLeads.length === 0 && <p className="text-muted-foreground text-center py-8">Заявок нет</p>}
+        </TabsContent>
+
+        <TabsContent value="research" className="space-y-3 mt-4">
+          {researchLeads
+            .filter(l => l.source_form !== 'academy_course')
+            .filter(l => filter(l.name) || filter(l.email) || filter(l.research_title || ""))
+            .map(l => (
+              <Card key={l.id}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-bold">{l.name}</p>
+                      <p className="text-sm text-muted-foreground">{l.email} · {l.phone}</p>
+                      {l.company && <p className="text-sm">{l.position ? `${l.position}, ` : ""}{l.company}</p>}
+                      {l.telegram && <p className="text-sm">Telegram: {l.telegram}</p>}
+                      <p className="text-sm">Исследование: <span className="text-neon-cyan">{l.research_title}</span></p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{fmt(l.created_at)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          {researchLeads.filter(l => l.source_form !== 'academy_course').length === 0 && <p className="text-muted-foreground text-center py-8">Заявок нет</p>}
+        </TabsContent>
+
+        <TabsContent value="academy" className="space-y-3 mt-4">
+          {researchLeads
+            .filter(l => l.source_form === 'academy_course')
+            .filter(l => filter(l.name) || filter(l.email) || filter(l.research_title || ""))
+            .map(l => (
+              <Card key={l.id}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-bold">{l.name}</p>
+                      <p className="text-sm text-muted-foreground">{l.email} · {l.phone}</p>
+                      <p className="text-sm">Курс: <span className="text-neon-cyan">{l.research_title}</span></p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{fmt(l.created_at)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          {researchLeads.filter(l => l.source_form === 'academy_course').length === 0 && <p className="text-muted-foreground text-center py-8">Заявок нет</p>}
         </TabsContent>
       </Tabs>
     </div>
