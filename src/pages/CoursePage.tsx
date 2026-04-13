@@ -146,15 +146,15 @@ export default function CoursePage() {
       </section>
 
       {/* Intro / Description */}
-      {(course.intro_title || course.description) && (
+      {course.intro_title && (
         <section className="py-16 border-t border-border">
           <div className="container max-w-3xl">
-            {course.intro_title && (
-              <h2 className="font-display text-2xl md:text-3xl font-black mb-4">{course.intro_title}</h2>
+            <h2 className="font-display text-2xl md:text-3xl font-black mb-4">{course.intro_title}</h2>
+            {course.intro_description && (
+              <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
+                {course.intro_description}
+              </p>
             )}
-            <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
-              {course.intro_description || course.description}
-            </p>
           </div>
         </section>
       )}
@@ -328,6 +328,128 @@ export default function CoursePage() {
           </div>
         </section>
       )}
+
+      {/* Bundle Promo */}
+      <section className="py-16 border-t border-border">
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative rounded-2xl overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/10 via-neon-magenta/10 to-neon-cyan/10" />
+            <div className="absolute top-0 left-1/4 w-72 h-72 bg-neon-cyan/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-neon-magenta/5 rounded-full blur-3xl" />
+
+            <div className="relative border border-neon-cyan/20 rounded-2xl p-8 md:p-12">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="flex-1 text-center md:text-left">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neon-magenta/40 bg-neon-magenta/10 mb-4">
+                    <span className="text-neon-magenta text-xs font-bold uppercase tracking-wider">Выгодное предложение</span>
+                  </div>
+                  <h3 className="font-display text-2xl md:text-3xl font-black mb-3">
+                    Комплексное обучение <span className="text-neon-magenta">-30%</span>
+                  </h3>
+                  <p className="text-muted-foreground mb-4 max-w-lg">
+                    Возьмите все курсы Академии единым пакетом — получите полную систему
+                    для юридического бизнеса: от экспертизы в БФЛ до управления командой и продаж.
+                    Скидка 30% при покупке комплекта.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start mb-4">
+                    <span className="text-sm text-muted-foreground line-through">345 000 ₽</span>
+                    <span className="text-2xl font-display font-black text-neon-cyan">241 500 ₽</span>
+                    <span className="text-xs font-bold text-neon-magenta bg-neon-magenta/10 px-2 py-1 rounded">экономия 103 500 ₽</span>
+                  </div>
+                  <p className="text-sm text-neon-cyan/80 mb-1">
+                    Доступна рассрочка на 6 месяцев — от 40 250 ₽/мес без переплат
+                  </p>
+                </div>
+                <div className="flex-shrink-0 flex flex-col gap-3">
+                  <button
+                    onClick={openFormModal}
+                    className="px-8 py-4 bg-gradient-to-r from-neon-cyan to-neon-magenta text-background font-display font-black rounded-xl hover:opacity-90 transition-opacity text-sm uppercase tracking-wider shadow-lg"
+                  >
+                    Получить комплект
+                  </button>
+                  <button
+                    onClick={openFormModal}
+                    className="px-8 py-3 border border-neon-cyan text-neon-cyan font-display font-bold rounded-xl hover:bg-accent/10 transition-colors text-sm uppercase tracking-wider"
+                  >
+                    Оформить заявку
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Refund via Case */}
+      <section className="py-16 border-t border-border">
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative rounded-2xl overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-neon-cyan/5 to-green-500/5" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-cyan/5 rounded-full blur-3xl" />
+
+            <div className="relative border border-green-500/20 rounded-2xl p-8 md:p-12">
+              <div className="grid md:grid-cols-[1fr,auto] gap-8 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-green-500/40 bg-green-500/10 mb-4">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-green-500 text-xs font-bold uppercase tracking-wider">Возврат инвестиций в обучение</span>
+                  </div>
+
+                  <h3 className="font-display text-2xl md:text-3xl font-black mb-4">
+                    Верните <span className="text-green-500">100%</span> стоимости курса
+                  </h3>
+
+                  <p className="text-muted-foreground mb-6 max-w-xl">
+                    Передайте дело на арбитражное сопровождение процедуры банкротства в нашу компанию —
+                    и стоимость обучения будет полностью зачтена. Вы оплачиваете только депозит
+                    арбитражного управляющего, предусмотренный законом.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="p-4 rounded-xl border border-border bg-card/50 text-center">
+                      <p className="font-display font-black text-xl text-green-500 mb-1">0 ₽</p>
+                      <p className="text-xs text-muted-foreground">за публикации и дополнительные услуги</p>
+                    </div>
+                    <div className="p-4 rounded-xl border border-border bg-card/50 text-center">
+                      <p className="font-display font-black text-xl text-neon-cyan mb-1">25 000 ₽</p>
+                      <p className="text-xs text-muted-foreground">депозит АУ по закону</p>
+                    </div>
+                    <div className="p-4 rounded-xl border border-border bg-card/50 text-center">
+                      <p className="font-display font-black text-xl text-neon-magenta mb-1">100%</p>
+                      <p className="text-xs text-muted-foreground">сопровождение под ключ</p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground/70">
+                    Предложение действует при заключении договора на арбитражное сопровождение.
+                    Подробности и условия — по запросу.
+                  </p>
+                </div>
+
+                <div className="flex-shrink-0 flex flex-col gap-3">
+                  <button
+                    onClick={openFormModal}
+                    className="px-8 py-4 bg-green-500 text-background font-display font-black rounded-xl hover:bg-green-400 transition-colors text-sm uppercase tracking-wider shadow-lg"
+                  >
+                    Узнать подробности
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Practice Tasks */}
       {course.practice_tasks?.length > 0 && (

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, MapPin, Users, Mic2 } from "lucide-react";
@@ -12,6 +13,10 @@ import { SpeakerForm } from "@/components/SpeakerForm";
 import { Footer } from "@/components/Footer";
 
 export default function ConferencePage() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}

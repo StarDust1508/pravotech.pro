@@ -109,11 +109,6 @@ export const HeroSection = () => {
               className="px-7 py-3 border border-neon-cyan text-neon-cyan font-display font-bold rounded-lg hover:bg-accent/10 transition-colors text-sm uppercase tracking-wider">
               Академия
             </button>
-            <button
-              onClick={() => scrollToSection("#sponsor-form")}
-              className="px-7 py-3 border border-border text-foreground/80 font-display font-bold rounded-lg hover:border-neon-magenta/50 hover:text-neon-magenta transition-colors text-sm uppercase tracking-wider">
-              Стать партнером
-            </button>
           </div>
         </motion.div>
       </div>
