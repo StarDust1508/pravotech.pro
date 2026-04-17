@@ -121,6 +121,7 @@ export interface AcademyCourse {
   hero_title: string;
   hero_subtitle: string;
   hero_description: string;
+  hero_highlights?: string[];
   price: string;
   level: string;
   display_order: number;
