@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n api,web -c blue,green \"npm run dev:server\" \"npm run dev:client\"",
+    "dev": "concurrently -n tunnel,api,web -c yellow,blue,green \"npm run dev:tunnel\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:tunnel": "bash scripts/tunnel.sh",
     "dev:client": "vite",
-    "dev:server": "npm --prefix server run dev",
+    "dev:server": "sleep 2 && npm --prefix server run dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

@@ -1,175 +1,204 @@
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { motion } from "framer-motion";
+import { Check } from "lucide-react";
+
+const metrics = [
+  { value: "5 000+", label: "Участников", context: "Ежегодная аудитория платформы" },
+  { value: "85%", label: "C-Level", context: "Топ-менеджеры и собственники практик" },
+  { value: "320%", label: "Средний ROI", context: "По данным партнёров прошлых выпусков" },
+  { value: "150+", label: "Лидов", context: "Квалифицированные контакты на партнёра" },
+];
+
+const valueProps = [
+  {
+    title: "Доступ к decision-makers",
+    desc: "Прямые контакты с ЛПР юрфирм, арбитражных управляющих и владельцев практик.",
+  },
+  {
+    title: "Тёплые B2B-лиды",
+    desc: "Квалифицированная аудитория, готовая к диалогу и коммерческим решениям.",
+  },
+  {
+    title: "Интеграция в отраслевую повестку",
+    desc: "Освещение в профильных каналах, сообществах и индустриальных публикациях.",
+  },
+  {
+    title: "Узнаваемость в Legal Tech",
+    desc: "Позиционирование бренда в сегменте legal tech и рынке БФЛ.",
+  },
+];
+
+const proofCase = {
+  company: "LegalTech Solutions",
+  personName: "Алексей Петров",
+  personRole: "Директор по развитию",
+  kpis: [
+    { value: "180", label: "лидов" },
+    { value: "3", label: "сделки" },
+    { value: "420%", label: "ROI" },
+  ],
+  quote:
+    "За 2 дня мы получили 180 качественных лидов и заключили 3 крупные сделки. Формат конференции даёт прямой выход на целевую аудиторию — собрать такой срез рынка другими каналами было бы в разы дороже.",
+};
 
 export default function WhyPartnerSection() {
   const scrollToSponsorForm = () => {
-    const element = document.getElementById('sponsor-form');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    const element = document.getElementById("sponsor-form");
+    if (element) element.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section className="py-20 px-4 bg-background relative overflow-hidden">
+    <section className="py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid" />
-      <div className="relative max-w-6xl mx-auto">
+      <div className="relative container max-w-6xl">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="max-w-2xl mb-14"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-neon-cyan via-neon-magenta to-neon-cyan bg-clip-text text-transparent">
-            Почему ТехнологИИ права?
+          <div className="text-neon-cyan text-[10px] font-bold uppercase tracking-[0.3em] mb-4">
+            B2B · Партнёрство и спонсорство
+          </div>
+          <h2 className="font-display text-3xl md:text-5xl font-black mb-5 uppercase leading-[1.05]">
+            Прямой выход
+            <br />
+            на юридический рынок
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Крупнейшая платформа о технологиях и ИИ в юридическом бизнесе с доказанной эффективностью
+          <p className="text-foreground/60 text-base md:text-lg leading-relaxed">
+            Партнёры получают 2 дня прямых контактов с ЛПР юрфирм, арбитражных управляющих и владельцев практик — аудиторию, которую сложно собрать другими каналами.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-center group"
-          >
-            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
-              <span className="text-5xl font-display font-black text-neon-cyan">5K+</span>
-            </div>
-            <h3 className="text-xl font-display font-bold mb-2">Участников</h3>
-            <p className="text-sm text-muted-foreground">Ежегодная аудитория конференции</p>
-          </motion.div>
+        {/* Proof metrics — unified */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm overflow-hidden mb-16"
+        >
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border/60">
+            {metrics.map((m, i) => (
+              <div key={i} className="p-6 md:p-7">
+                <div className="font-display text-4xl md:text-5xl font-black text-neon-cyan leading-none mb-3">
+                  {m.value}
+                </div>
+                <div className="font-display text-sm font-bold mb-1.5 uppercase tracking-wider">{m.label}</div>
+                <div className="text-muted-foreground text-xs leading-relaxed">{m.context}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-center group"
-          >
-            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
-              <span className="text-5xl font-display font-black text-neon-magenta">85%</span>
-            </div>
-            <h3 className="text-xl font-display font-bold mb-2">C-Level</h3>
-            <p className="text-sm text-muted-foreground">Топ-менеджеры и владельцы бизнеса</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="text-center group"
-          >
-            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
-              <span className="text-5xl font-display font-black text-green-500">320%</span>
-            </div>
-            <h3 className="text-xl font-display font-bold mb-2">Средний ROI</h3>
-            <p className="text-sm text-muted-foreground">Возврат инвестиций партнеров</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-            className="text-center group"
-          >
-            <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
-              <span className="text-5xl font-display font-black text-orange-500">150+</span>
-            </div>
-            <h3 className="text-xl font-display font-bold mb-2">Лидов</h3>
-            <p className="text-sm text-muted-foreground">Качественных контактов на спонсора</p>
-          </motion.div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        {/* Value props + Proof case */}
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
+          {/* Left — Value proposition */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-6"
           >
-            <h3 className="text-3xl font-display font-bold">
-              Уникальная экосистема
+            <div className="text-neon-cyan text-[10px] font-bold uppercase tracking-[0.3em] mb-3">
+              Что получает партнёр
+            </div>
+            <h3 className="font-display text-2xl md:text-3xl font-black mb-8 leading-tight">
+              Экосистема результата, а не просто площадка
             </h3>
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-neon-cyan rounded-full flex-shrink-0 mt-1 flex items-center justify-center">
-                  <span className="text-xs text-primary-foreground">✓</span>
+            <div className="space-y-6">
+              {valueProps.map((item, i) => (
+                <div key={i} className="flex items-start gap-4">
+                  <div className="w-7 h-7 rounded-full border border-neon-cyan/40 bg-neon-cyan/5 flex-shrink-0 mt-0.5 flex items-center justify-center">
+                    <Check size={14} className="text-neon-cyan" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold mb-1.5 text-base">{item.title}</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold mb-1">Эксклюзивный нетворкинг</h4>
-                  <p className="text-sm text-muted-foreground">Доступ к закрытым мероприятиям с ключевыми игроками рынка</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-neon-magenta rounded-full flex-shrink-0 mt-1 flex items-center justify-center">
-                  <span className="text-xs text-primary-foreground">✓</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-1">Медийное покрытие</h4>
-                  <p className="text-sm text-muted-foreground">Освещение в ведущих профильных изданиях и соцсетях</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex-shrink-0 mt-1 flex items-center justify-center">
-                  <span className="text-xs text-primary-foreground">✓</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-1">B2B площадка</h4>
-                  <p className="text-sm text-muted-foreground">Прямые контакты с потенциальными клиентами и партнерами</p>
-                </div>
-              </div>
+              ))}
             </div>
           </motion.div>
 
+          {/* Right — Proof case */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-muted/30 rounded-2xl p-8 border border-border"
+            className="relative rounded-2xl border border-neon-magenta/25 bg-card/80 backdrop-blur-sm overflow-hidden"
           >
-            <div className="text-center mb-6">
-              <h4 className="text-2xl font-display font-bold mb-2">Отзыв партнера</h4>
-              <div className="flex justify-center mb-4">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <span key={star} className="text-yellow-500 text-xl">★</span>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-neon-magenta/[0.05] rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative p-7 md:p-8">
+              {/* Eyebrow */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="text-neon-magenta text-[10px] font-bold uppercase tracking-[0.3em]">
+                  Кейс партнёра
+                </div>
+                <div className="font-display text-xs font-bold text-foreground/50 uppercase tracking-wider">
+                  {proofCase.company}
+                </div>
+              </div>
+
+              {/* KPI row — proof headline */}
+              <div className="grid grid-cols-3 gap-3 mb-6 pb-6 border-b border-border/60">
+                {proofCase.kpis.map((kpi, i) => (
+                  <div key={i}>
+                    <div className="font-display text-2xl md:text-3xl font-black text-neon-magenta leading-none mb-1.5">
+                      {kpi.value}
+                    </div>
+                    <div className="text-muted-foreground text-[11px] uppercase tracking-wider">{kpi.label}</div>
+                  </div>
                 ))}
               </div>
-            </div>
-            <blockquote className="text-center italic text-muted-foreground mb-4">
-              "«ТехнологИИ права» превзошел все наши ожидания. За 2 дня мы получили 180 качественных лидов и заключили 3 крупные сделки. ROI составил 420%."
-            </blockquote>
-            <div className="text-center">
-              <p className="font-semibold">Алексей Петров</p>
-              <p className="text-sm text-muted-foreground">Директор по развитию, LegalTech Solutions</p>
+
+              {/* Quote */}
+              <blockquote className="text-foreground/80 text-sm md:text-base leading-relaxed mb-6">
+                «{proofCase.quote}»
+              </blockquote>
+
+              {/* Signature */}
+              <div className="flex items-center gap-3 pt-2">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan/20 to-neon-magenta/20 border border-border flex items-center justify-center font-display font-black text-sm text-foreground/80">
+                  {proofCase.personName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </div>
+                <div>
+                  <div className="font-display font-bold text-sm">{proofCase.personName}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {proofCase.personRole}, {proofCase.company}
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
 
+        {/* CTA band */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 text-center"
+          className="mt-14 rounded-2xl border border-neon-cyan/25 bg-gradient-to-r from-neon-cyan/[0.05] via-card/50 to-neon-magenta/[0.05] backdrop-blur-sm"
         >
-          <div className="bg-gradient-to-r from-neon-cyan/10 to-neon-magenta/10 rounded-2xl p-8 border border-neon-cyan/20">
-            <h4 className="text-2xl font-display font-bold mb-4">
-              🎯 Готовы к коллаборации?
-            </h4>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Присоединяйтесь к экосистеме инноваций и станьте частью будущего правовых технологий
-            </p>
-            <button 
+          <div className="grid md:grid-cols-[1.5fr_1fr] gap-6 p-7 md:p-8 items-center">
+            <div>
+              <h3 className="font-display text-xl md:text-2xl font-black mb-2 leading-tight">
+                Обсудить форматы партнёрства
+              </h3>
+              <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
+                Команда подберёт формат участия под задачи бизнеса — от отраслевой интеграции до целевой lead-кампании.
+              </p>
+            </div>
+            <button
               onClick={scrollToSponsorForm}
-              className="px-8 py-3 bg-neon-cyan text-primary-foreground font-display font-bold rounded-lg shadow-neon-cyan hover:opacity-90 transition-opacity"
+              className="px-7 py-3.5 bg-neon-cyan text-accent-foreground font-display font-bold rounded-lg hover:bg-neon-cyan/90 transition-colors text-sm uppercase tracking-wider"
             >
-              Стать партнером
+              Стать партнёром
             </button>
           </div>
         </motion.div>

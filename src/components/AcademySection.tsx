@@ -16,18 +16,8 @@ export const AcademySection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <section id="academy" className="py-20">
-        <div className="container text-center text-muted-foreground">Загрузка курсов...</div>
-      </section>
-    );
-  }
-
-  if (courses.length === 0) return null;
-
   return (
-    <section id="academy" className="py-20">
+    <section id="academy" className="py-20 scroll-mt-20">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -47,6 +37,21 @@ export const AcademySection = () => {
           </p>
         </motion.div>
 
+        {loading && (
+          <div className="text-center text-muted-foreground py-12">Загрузка курсов...</div>
+        )}
+
+        {!loading && courses.length === 0 && (
+          <div className="text-center py-12 border border-border rounded-xl bg-card">
+            <BookOpen className="w-12 h-12 text-neon-cyan mx-auto mb-4 opacity-60" />
+            <p className="font-display text-lg font-bold mb-2">Курсы скоро появятся</p>
+            <p className="text-muted-foreground text-sm max-w-md mx-auto">
+              Готовим программы от ведущих экспертов отрасли. Следите за обновлениями.
+            </p>
+          </div>
+        )}
+
+        {!loading && courses.length > 0 && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course, i) => (
             <motion.div
@@ -84,6 +89,7 @@ export const AcademySection = () => {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );

@@ -43,7 +43,10 @@ export const AboutProjectSection = () => {
             О проекте
           </h2>
           <p className="text-muted-foreground text-base md:text-lg">
-            <span className="font-semibold"><span className="text-neon-cyan">Технолог</span><span className="text-neon-magenta">ИИ</span></span> <span className="text-neon-cyan font-semibold">права</span> — платформа
+            <span className="font-semibold">
+              <span className="text-neon-cyan">Технолог</span><span className="text-neon-magenta font-bold">ии</span>{" "}
+              <span className="text-neon-cyan">права</span>
+            </span> — платформа
             об искусственном интеллекте, цифровых технологиях и масштабировании юридического
             бизнеса в сфере банкротства физических лиц. Мы объединяем исследования,
             аналитику, обучение и крупнейшую отраслевую конференцию.

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, GraduationCap, BookOpen, Users, CheckCircle2, Star, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, GraduationCap, BookOpen, Users, CheckCircle2, Star, X } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 import { api } from "@/lib/api";
 import type { AcademyCourse, AcademyTeacher, AcademyReview } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -100,18 +101,7 @@ export default function CoursePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="font-display text-lg font-bold">
-            <span className="text-neon-cyan">ТЕХНОЛОГ</span><span className="text-neon-magenta">ИИ</span>{" "}
-            <span className="text-neon-cyan">ПРАВА</span>
-          </Link>
-          <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-cyan transition-colors">
-            <ArrowLeft size={16} /> На главную
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero */}
       <section className="pt-28 pb-16 relative overflow-hidden">
@@ -244,7 +234,7 @@ export default function CoursePage() {
       {/* Program / Lessons */}
       {course.lessons?.length > 0 && (
         <section className="py-16 border-t border-border">
-          <div className="container max-w-3xl">
+          <div className="container">
             <div className="flex items-center justify-between mb-8">
               <h2 className="font-display text-2xl md:text-3xl font-black uppercase">Программа курса</h2>
               {course.program_badge && (
@@ -666,7 +656,7 @@ export default function CoursePage() {
             <span className="text-neon-cyan">ТЕХНОЛОГ</span><span className="text-neon-magenta">ИИ</span>{" "}
             <span className="text-neon-cyan">ПРАВА</span>
           </Link>
-          <p className="text-xs text-muted-foreground mt-2">&copy; 2026 ТехнологИИ права. Все права защищены.</p>
+          <p className="text-xs text-muted-foreground mt-2">&copy; 2026 Технологии права. Все права защищены.</p>
         </div>
       </footer>
 
