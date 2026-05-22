@@ -1294,163 +1294,273 @@ export default function CoursePage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          ANIMATED PROMO — 8-second "trailer" loop
-          Cycles through 4 slides with course highlights
-          ═══════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════
+          CINEMATIC 8-SECOND PROMO TRAILER
+          Fullscreen auto-playing slide show with dramatic transitions
+          ═══════════════════════════════════════════════════════ */}
       {(() => {
         const totalLessonsCount = course.lessons?.length || 12;
-        const promoSlides = [
+        const teacherCount = courseTeachers.length;
+
+        interface PromoFrame {
+          bigText: string;
+          bigSuffix?: string;
+          headline: string;
+          sub: string;
+          accent: "cyan" | "magenta";
+          IconComp: typeof Play;
+        }
+
+        const frames: PromoFrame[] = [
           {
-            icon: Play,
-            number: totalLessonsCount,
-            suffix: "",
-            label: totalLessonsCount >= 14 ? "занятий" : "занятий",
-            sub: "Видеоуроки · живые разборы · практика",
-            gradient: "from-neon-cyan/20 via-neon-cyan/5 to-transparent",
-            accent: "neon-cyan",
+            bigText: String(totalLessonsCount),
+            headline: "видеозанятий с экспертами",
+            sub: "Записи лекций · живые разборы · домашние задания",
+            accent: "cyan",
+            IconComp: Play,
           },
           {
-            icon: Target,
-            number: 100,
-            suffix: "%",
-            label: "практики",
-            sub: "Реальные кейсы · чек-листы · toolkit",
-            gradient: "from-neon-magenta/20 via-neon-magenta/5 to-transparent",
-            accent: "neon-magenta",
+            bigText: String(teacherCount),
+            headline: "практикующих экспертов",
+            sub: "Арбитражные управляющие · руководители практик БФЛ",
+            accent: "magenta",
+            IconComp: Users,
           },
           {
-            icon: Award,
-            number: 0,
-            suffix: "",
-            label: "Удостоверение",
-            sub: "Повышение квалификации · итоговый тест",
-            gradient: "from-neon-cyan/15 via-neon-magenta/10 to-transparent",
-            accent: "neon-cyan",
+            bigText: "100",
+            bigSuffix: "%",
+            headline: "практики на реальных делах",
+            sub: "Чек-листы · toolkit · шаблоны документов · кейсы",
+            accent: "cyan",
+            IconComp: Target,
           },
           {
-            icon: Unlock,
-            number: 0,
-            suffix: "",
-            label: "Мгновенный доступ",
-            sub: "Оплатите — начинайте учиться прямо сейчас",
-            gradient: "from-neon-magenta/15 via-neon-cyan/10 to-transparent",
-            accent: "neon-magenta",
+            bigText: "∞",
+            headline: "бессрочный доступ + сертификат",
+            sub: "Удостоверение о повышении квалификации · мгновенный старт",
+            accent: "magenta",
+            IconComp: Award,
           },
         ];
 
-        return (
-          <section className="relative overflow-hidden border-t border-border">
-            {/* Animated background pulse */}
-            <div className="absolute inset-0">
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-neon-cyan/[0.03] via-transparent to-neon-magenta/[0.03]"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              />
-              {/* Scanning line effect */}
-              <motion.div
-                className="absolute top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-neon-cyan/40 to-transparent"
-                animate={{ left: ["-5%", "105%"] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              />
-            </div>
+        const FRAME_DURATION = 2000;
 
-            <div className="container relative z-10 py-8 md:py-10">
-              {/* Mini label */}
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <motion.div
-                  className="w-2 h-2 rounded-full bg-neon-cyan"
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-neon-cyan/80">
-                  О курсе за 8 секунд
-                </span>
-                <motion.div
-                  className="w-2 h-2 rounded-full bg-neon-magenta"
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                />
-              </div>
+        const PromoTrailer = () => {
+          const [activeFrame, setActiveFrame] = useState(0);
+          const [isPlaying, setIsPlaying] = useState(true);
+          const [hasStarted, setHasStarted] = useState(false);
 
-              {/* Promo slides — horizontal scroll on mobile, grid on desktop */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                {promoSlides.map((slide, i) => (
+          useEffect(() => {
+            if (!isPlaying || !hasStarted) return;
+            const timer = setInterval(() => {
+              setActiveFrame(prev => (prev + 1) % frames.length);
+            }, FRAME_DURATION);
+            return () => clearInterval(timer);
+          }, [isPlaying, hasStarted]);
+
+          const startTrailer = useCallback(() => {
+            setHasStarted(true);
+            setIsPlaying(true);
+            setActiveFrame(0);
+          }, []);
+
+          const frame = frames[activeFrame];
+          const isCyan = frame.accent === "cyan";
+
+          return (
+            <section className="relative overflow-hidden border-t border-neon-cyan/10 border-b border-b-neon-magenta/10">
+              {/* Deep background */}
+              <div className="absolute inset-0 bg-gradient-to-b from-background via-[hsl(220,20%,4%)] to-background" />
+
+              {/* Animated glow orbs */}
+              <motion.div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none"
+                animate={{
+                  background: isCyan
+                    ? "radial-gradient(circle, rgba(0,255,255,0.12) 0%, transparent 70%)"
+                    : "radial-gradient(circle, rgba(255,51,153,0.12) 0%, transparent 70%)",
+                  scale: [0.8, 1.1, 0.8],
+                }}
+                transition={{ duration: 2, ease: "easeInOut" }}
+              />
+
+              {/* Scanning line */}
+              {hasStarted && (
+                <motion.div
+                  className="absolute top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-neon-cyan/50 to-transparent pointer-events-none"
+                  animate={{ left: ["-5%", "105%"] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                />
+              )}
+
+              {/* Corner decorations */}
+              <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-neon-cyan/20 rounded-tl-sm" />
+              <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-neon-magenta/20 rounded-tr-sm" />
+              <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-neon-magenta/20 rounded-bl-sm" />
+              <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-neon-cyan/20 rounded-br-sm" />
+
+              <div className="container relative z-10 py-16 md:py-24">
+                {/* Not started — show play button */}
+                {!hasStarted ? (
                   <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.15, duration: 0.5, type: "spring" }}
-                    className="relative group"
+                    className="flex flex-col items-center justify-center min-h-[280px] md:min-h-[360px] cursor-pointer"
+                    onClick={startTrailer}
                   >
-                    <div className={`relative overflow-hidden rounded-xl border bg-card/80 backdrop-blur-sm p-5 md:p-6 h-full transition-all duration-300 ${
-                      slide.accent === "neon-cyan"
-                        ? "border-neon-cyan/20 hover:border-neon-cyan/50 hover:shadow-[0_0_30px_-5px_rgba(0,255,255,0.2)]"
-                        : "border-neon-magenta/20 hover:border-neon-magenta/50 hover:shadow-[0_0_30px_-5px_rgba(255,51,153,0.2)]"
-                    }`}>
-                      {/* Background gradient */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    {/* Play button */}
+                    <motion.div
+                      className="relative mb-6"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <motion.div
+                        className="absolute inset-0 rounded-full bg-neon-magenta/20 blur-xl"
+                        animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.8, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-neon-magenta/60 bg-neon-magenta/10 backdrop-blur-sm flex items-center justify-center">
+                        <Play className="w-8 h-8 md:w-10 md:h-10 text-neon-magenta fill-neon-magenta/30 ml-1" />
+                      </div>
+                    </motion.div>
 
-                      <div className="relative z-10">
-                        {/* Icon with pulse */}
+                    <h3 className="font-display text-xl md:text-2xl font-black text-foreground mb-2">
+                      О курсе за <span className="text-neon-cyan">8 секунд</span>
+                    </h3>
+                    <p className="text-sm text-foreground/40">
+                      Нажмите, чтобы запустить
+                    </p>
+                  </motion.div>
+                ) : (
+                  /* Playing — show frames */
+                  <div className="min-h-[280px] md:min-h-[360px] flex flex-col items-center justify-center">
+                    {/* REC indicator */}
+                    <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-red-500"
+                        animate={{ opacity: [1, 0.3, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      />
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-red-500/70">
+                        promo
+                      </span>
+                      <span className="text-[10px] font-mono text-foreground/30 ml-2">
+                        {String(activeFrame + 1).padStart(2, "0")}/{String(frames.length).padStart(2, "0")}
+                      </span>
+                    </div>
+
+                    {/* Main content — animated frame */}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeFrame}
+                        initial={{ opacity: 0, y: 40, scale: 0.9, filter: "blur(10px)" }}
+                        animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: -30, scale: 1.05, filter: "blur(8px)" }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        className="flex flex-col items-center text-center"
+                      >
+                        {/* Icon */}
                         <motion.div
-                          className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 md:mb-4 ${
-                            slide.accent === "neon-cyan"
-                              ? "border border-neon-cyan/30 bg-neon-cyan/10"
-                              : "border border-neon-magenta/30 bg-neon-magenta/10"
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ delay: 0.1, duration: 0.4, type: "spring" }}
+                          className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-6 ${
+                            isCyan
+                              ? "border border-neon-cyan/40 bg-neon-cyan/10 shadow-[0_0_40px_rgba(0,255,255,0.15)]"
+                              : "border border-neon-magenta/40 bg-neon-magenta/10 shadow-[0_0_40px_rgba(255,51,153,0.15)]"
                           }`}
-                          animate={{ scale: [1, 1.05, 1] }}
-                          transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
                         >
-                          <slide.icon className={`w-5 h-5 md:w-6 md:h-6 ${
-                            slide.accent === "neon-cyan" ? "text-neon-cyan" : "text-neon-magenta"
-                          }`} strokeWidth={1.75} />
+                          <frame.IconComp
+                            className={`w-7 h-7 md:w-8 md:h-8 ${isCyan ? "text-neon-cyan" : "text-neon-magenta"}`}
+                            strokeWidth={1.5}
+                          />
                         </motion.div>
 
-                        {/* Number or label */}
-                        {slide.number > 0 ? (
-                          <div className="mb-1">
-                            <span className={`font-display text-3xl md:text-4xl font-black leading-none ${
-                              slide.accent === "neon-cyan" ? "text-neon-cyan" : "text-neon-magenta"
+                        {/* Big number */}
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.15, duration: 0.35, type: "spring", stiffness: 200 }}
+                          className="mb-3"
+                        >
+                          <span className={`font-display text-7xl md:text-9xl font-black leading-none tracking-tight ${
+                            isCyan ? "text-neon-cyan" : "text-neon-magenta"
+                          }`}>
+                            {frame.bigText}
+                          </span>
+                          {frame.bigSuffix && (
+                            <span className={`font-display text-4xl md:text-6xl font-black ${
+                              isCyan ? "text-neon-cyan/60" : "text-neon-magenta/60"
                             }`}>
-                              {slide.number}
+                              {frame.bigSuffix}
                             </span>
-                            {slide.suffix && (
-                              <span className={`font-display text-xl md:text-2xl font-black ${
-                                slide.accent === "neon-cyan" ? "text-neon-cyan/70" : "text-neon-magenta/70"
-                              }`}>
-                                {slide.suffix}
-                              </span>
-                            )}
-                          </div>
-                        ) : null}
-                        <div className="font-display text-sm md:text-base font-black leading-tight mb-1.5">
-                          {slide.label}
-                        </div>
-                        <p className="text-[11px] md:text-xs text-foreground/50 leading-relaxed">
-                          {slide.sub}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                          )}
+                        </motion.div>
 
-              {/* Progress bar — 8-second loop */}
-              <div className="mt-6 flex items-center justify-center">
-                <div className="w-full max-w-md h-0.5 bg-foreground/10 rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-neon-cyan via-neon-magenta to-neon-cyan rounded-full"
-                    animate={{ width: ["0%", "100%"] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                  />
-                </div>
+                        {/* Headline */}
+                        <motion.h3
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.25, duration: 0.3 }}
+                          className="font-display text-xl md:text-3xl font-black text-foreground mb-3 max-w-lg"
+                        >
+                          {frame.headline}
+                        </motion.h3>
+
+                        {/* Subtitle */}
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4, duration: 0.3 }}
+                          className="text-sm md:text-base text-foreground/45 max-w-md"
+                        >
+                          {frame.sub}
+                        </motion.p>
+                      </motion.div>
+                    </AnimatePresence>
+
+                    {/* Bottom controls */}
+                    <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 w-full max-w-sm px-4">
+                      {/* Progress segments */}
+                      <div className="flex items-center gap-1.5 w-full">
+                        {frames.map((_, i) => (
+                          <div
+                            key={i}
+                            className="flex-1 h-1 rounded-full bg-foreground/10 overflow-hidden cursor-pointer"
+                            onClick={() => { setActiveFrame(i); setIsPlaying(true); }}
+                          >
+                            {i < activeFrame ? (
+                              <div className="h-full w-full bg-gradient-to-r from-neon-cyan to-neon-magenta rounded-full" />
+                            ) : i === activeFrame ? (
+                              <motion.div
+                                className="h-full bg-gradient-to-r from-neon-cyan to-neon-magenta rounded-full"
+                                initial={{ width: "0%" }}
+                                animate={{ width: "100%" }}
+                                transition={{ duration: FRAME_DURATION / 1000, ease: "linear" }}
+                                key={`progress-${activeFrame}-${Date.now()}`}
+                              />
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Play/pause */}
+                      <button
+                        onClick={() => setIsPlaying(p => !p)}
+                        className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/30 hover:text-foreground/60 transition-colors"
+                      >
+                        {isPlaying ? "⏸ пауза" : "▶ играть"}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          </section>
-        );
+            </section>
+          );
+        };
+
+        return <PromoTrailer />;
       })()}
 
       {/* Intro / Description */}
