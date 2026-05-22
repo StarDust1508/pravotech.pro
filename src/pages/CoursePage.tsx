@@ -1295,272 +1295,184 @@ export default function CoursePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          CINEMATIC 8-SECOND PROMO TRAILER
-          Fullscreen auto-playing slide show with dramatic transitions
+          AUTO-PLAYING PROMO BANNER
+          Bright, juicy, tech-styled course ad — no buttons, pure motion
           ═══════════════════════════════════════════════════════ */}
       {(() => {
         const totalLessonsCount = course.lessons?.length || 12;
         const teacherCount = courseTeachers.length;
 
-        interface PromoFrame {
-          bigText: string;
-          bigSuffix?: string;
-          headline: string;
-          sub: string;
-          accent: "cyan" | "magenta";
-          IconComp: typeof Play;
-        }
-
-        const frames: PromoFrame[] = [
-          {
-            bigText: String(totalLessonsCount),
-            headline: "видеозанятий с экспертами",
-            sub: "Записи лекций · живые разборы · домашние задания",
-            accent: "cyan",
-            IconComp: Play,
-          },
-          {
-            bigText: String(teacherCount),
-            headline: "практикующих экспертов",
-            sub: "Арбитражные управляющие · руководители практик БФЛ",
-            accent: "magenta",
-            IconComp: Users,
-          },
-          {
-            bigText: "100",
-            bigSuffix: "%",
-            headline: "практики на реальных делах",
-            sub: "Чек-листы · toolkit · шаблоны документов · кейсы",
-            accent: "cyan",
-            IconComp: Target,
-          },
-          {
-            bigText: "∞",
-            headline: "бессрочный доступ + сертификат",
-            sub: "Удостоверение о повышении квалификации · мгновенный старт",
-            accent: "magenta",
-            IconComp: Award,
-          },
+        const promoFacts = [
+          { value: String(totalLessonsCount), label: "занятий", color: "cyan" as const },
+          { value: String(teacherCount), label: "экспертов", color: "magenta" as const },
+          { value: "100%", label: "практики", color: "cyan" as const },
+          { value: "∞", label: "доступ", color: "magenta" as const },
         ];
 
-        const FRAME_DURATION = 2000;
+        const promoLines = [
+          { text: "Видеолекции · Живые разборы · Домашние задания", color: "cyan" as const },
+          { text: "Чек-листы · Toolkit · Шаблоны документов", color: "magenta" as const },
+          { text: "Реальные кейсы · Судебная практика 2026", color: "cyan" as const },
+          { text: "Удостоверение · Мгновенный старт · Поддержка", color: "magenta" as const },
+        ];
 
-        const PromoTrailer = () => {
-          const [activeFrame, setActiveFrame] = useState(0);
-          const [isPlaying, setIsPlaying] = useState(true);
-          const [hasStarted, setHasStarted] = useState(false);
+        const PromoBanner = () => {
+          const [tick, setTick] = useState(0);
 
           useEffect(() => {
-            if (!isPlaying || !hasStarted) return;
-            const timer = setInterval(() => {
-              setActiveFrame(prev => (prev + 1) % frames.length);
-            }, FRAME_DURATION);
+            const timer = setInterval(() => setTick(t => t + 1), 2500);
             return () => clearInterval(timer);
-          }, [isPlaying, hasStarted]);
-
-          const startTrailer = useCallback(() => {
-            setHasStarted(true);
-            setIsPlaying(true);
-            setActiveFrame(0);
           }, []);
 
-          const frame = frames[activeFrame];
-          const isCyan = frame.accent === "cyan";
+          const activeLineIdx = tick % promoLines.length;
 
           return (
-            <section className="relative overflow-hidden border-t border-neon-cyan/10 border-b border-b-neon-magenta/10">
-              {/* Deep background */}
-              <div className="absolute inset-0 bg-gradient-to-b from-background via-[hsl(220,20%,4%)] to-background" />
+            <section className="relative overflow-hidden">
+              {/* Background — deep dark with animated gradient mesh */}
+              <div className="absolute inset-0 bg-[hsl(225,25%,3%)]" />
 
-              {/* Animated glow orbs */}
+              {/* Animated gradient blobs */}
               <motion.div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none"
-                animate={{
-                  background: isCyan
-                    ? "radial-gradient(circle, rgba(0,255,255,0.12) 0%, transparent 70%)"
-                    : "radial-gradient(circle, rgba(255,51,153,0.12) 0%, transparent 70%)",
-                  scale: [0.8, 1.1, 0.8],
-                }}
-                transition={{ duration: 2, ease: "easeInOut" }}
+                className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full pointer-events-none"
+                style={{ background: "radial-gradient(circle, rgba(0,255,255,0.08) 0%, transparent 70%)" }}
+                animate={{ x: [0, 60, 0], y: [0, 40, 0], scale: [1, 1.2, 1] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full pointer-events-none"
+                style={{ background: "radial-gradient(circle, rgba(255,51,153,0.08) 0%, transparent 70%)" }}
+                animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1.1, 0.9, 1.1] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              />
+              <motion.div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full pointer-events-none"
+                style={{ background: "radial-gradient(circle, rgba(0,255,255,0.04) 0%, transparent 60%)" }}
+                animate={{ scale: [0.8, 1.3, 0.8], opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
               />
 
-              {/* Scanning line */}
-              {hasStarted && (
-                <motion.div
-                  className="absolute top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-neon-cyan/50 to-transparent pointer-events-none"
-                  animate={{ left: ["-5%", "105%"] }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                />
-              )}
+              {/* Horizontal scan line */}
+              <motion.div
+                className="absolute left-0 right-0 h-[1px] pointer-events-none"
+                style={{ background: "linear-gradient(90deg, transparent, rgba(0,255,255,0.3), transparent)" }}
+                animate={{ top: ["-5%", "105%"] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+              />
 
-              {/* Corner decorations */}
-              <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-neon-cyan/20 rounded-tl-sm" />
-              <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-neon-magenta/20 rounded-tr-sm" />
-              <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-neon-magenta/20 rounded-bl-sm" />
-              <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-neon-cyan/20 rounded-br-sm" />
+              {/* Grid overlay for tech feel */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-[0.03]"
+                style={{
+                  backgroundImage: "linear-gradient(rgba(0,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.3) 1px, transparent 1px)",
+                  backgroundSize: "60px 60px",
+                }}
+              />
 
-              <div className="container relative z-10 py-16 md:py-24">
-                {/* Not started — show play button */}
-                {!hasStarted ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    className="flex flex-col items-center justify-center min-h-[280px] md:min-h-[360px] cursor-pointer"
-                    onClick={startTrailer}
-                  >
-                    {/* Play button */}
+              <div className="container relative z-10 py-10 md:py-14">
+                {/* Top: Stats row — always visible, glowing */}
+                <div className="flex items-center justify-center gap-4 md:gap-8 mb-8 md:mb-10">
+                  {promoFacts.map((fact, i) => (
                     <motion.div
-                      className="relative mb-6"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, duration: 0.5 }}
+                      className="flex flex-col items-center"
                     >
-                      <motion.div
-                        className="absolute inset-0 rounded-full bg-neon-magenta/20 blur-xl"
-                        animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.8, 0.5] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      />
-                      <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-neon-magenta/60 bg-neon-magenta/10 backdrop-blur-sm flex items-center justify-center">
-                        <Play className="w-8 h-8 md:w-10 md:h-10 text-neon-magenta fill-neon-magenta/30 ml-1" />
-                      </div>
+                      <motion.span
+                        className={`font-display text-3xl md:text-5xl lg:text-6xl font-black leading-none ${
+                          fact.color === "cyan" ? "text-neon-cyan" : "text-neon-magenta"
+                        }`}
+                        style={{
+                          textShadow: fact.color === "cyan"
+                            ? "0 0 30px rgba(0,255,255,0.4), 0 0 60px rgba(0,255,255,0.15)"
+                            : "0 0 30px rgba(255,51,153,0.4), 0 0 60px rgba(255,51,153,0.15)",
+                        }}
+                        animate={{ opacity: [0.85, 1, 0.85] }}
+                        transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+                      >
+                        {fact.value}
+                      </motion.span>
+                      <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-foreground/40 mt-1.5">
+                        {fact.label}
+                      </span>
                     </motion.div>
+                  ))}
+                </div>
 
-                    <h3 className="font-display text-xl md:text-2xl font-black text-foreground mb-2">
-                      О курсе за <span className="text-neon-cyan">8 секунд</span>
-                    </h3>
-                    <p className="text-sm text-foreground/40">
-                      Нажмите, чтобы запустить
-                    </p>
-                  </motion.div>
-                ) : (
-                  /* Playing — show frames */
-                  <div className="min-h-[280px] md:min-h-[360px] flex flex-col items-center justify-center">
-                    {/* REC indicator */}
-                    <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
-                      <motion.div
-                        className="w-2 h-2 rounded-full bg-red-500"
-                        animate={{ opacity: [1, 0.3, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      />
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-red-500/70">
-                        promo
-                      </span>
-                      <span className="text-[10px] font-mono text-foreground/30 ml-2">
-                        {String(activeFrame + 1).padStart(2, "0")}/{String(frames.length).padStart(2, "0")}
-                      </span>
-                    </div>
+                {/* Divider with glow */}
+                <div className="flex items-center justify-center mb-8 md:mb-10">
+                  <motion.div
+                    className="h-[1px] w-full max-w-xl"
+                    style={{ background: "linear-gradient(90deg, transparent, rgba(0,255,255,0.5), rgba(255,51,153,0.5), transparent)" }}
+                    animate={{ opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                </div>
 
-                    {/* Main content — animated frame */}
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={activeFrame}
-                        initial={{ opacity: 0, y: 40, scale: 0.9, filter: "blur(10px)" }}
-                        animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        exit={{ opacity: 0, y: -30, scale: 1.05, filter: "blur(8px)" }}
-                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                        className="flex flex-col items-center text-center"
+                {/* Center: rotating text line */}
+                <div className="relative h-14 md:h-16 flex items-center justify-center overflow-hidden mb-8 md:mb-10">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeLineIdx}
+                      initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -30, filter: "blur(8px)" }}
+                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <span
+                        className={`font-display text-base md:text-xl lg:text-2xl font-black tracking-wide text-center px-4 ${
+                          promoLines[activeLineIdx].color === "cyan" ? "text-neon-cyan/90" : "text-neon-magenta/90"
+                        }`}
+                        style={{
+                          textShadow: promoLines[activeLineIdx].color === "cyan"
+                            ? "0 0 20px rgba(0,255,255,0.3)"
+                            : "0 0 20px rgba(255,51,153,0.3)",
+                        }}
                       >
-                        {/* Icon */}
-                        <motion.div
-                          initial={{ scale: 0, rotate: -180 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          transition={{ delay: 0.1, duration: 0.4, type: "spring" }}
-                          className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-6 ${
-                            isCyan
-                              ? "border border-neon-cyan/40 bg-neon-cyan/10 shadow-[0_0_40px_rgba(0,255,255,0.15)]"
-                              : "border border-neon-magenta/40 bg-neon-magenta/10 shadow-[0_0_40px_rgba(255,51,153,0.15)]"
-                          }`}
-                        >
-                          <frame.IconComp
-                            className={`w-7 h-7 md:w-8 md:h-8 ${isCyan ? "text-neon-cyan" : "text-neon-magenta"}`}
-                            strokeWidth={1.5}
-                          />
-                        </motion.div>
+                        {promoLines[activeLineIdx].text}
+                      </span>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
 
-                        {/* Big number */}
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.15, duration: 0.35, type: "spring", stiffness: 200 }}
-                          className="mb-3"
-                        >
-                          <span className={`font-display text-7xl md:text-9xl font-black leading-none tracking-tight ${
-                            isCyan ? "text-neon-cyan" : "text-neon-magenta"
-                          }`}>
-                            {frame.bigText}
-                          </span>
-                          {frame.bigSuffix && (
-                            <span className={`font-display text-4xl md:text-6xl font-black ${
-                              isCyan ? "text-neon-cyan/60" : "text-neon-magenta/60"
-                            }`}>
-                              {frame.bigSuffix}
-                            </span>
-                          )}
-                        </motion.div>
-
-                        {/* Headline */}
-                        <motion.h3
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.25, duration: 0.3 }}
-                          className="font-display text-xl md:text-3xl font-black text-foreground mb-3 max-w-lg"
-                        >
-                          {frame.headline}
-                        </motion.h3>
-
-                        {/* Subtitle */}
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.4, duration: 0.3 }}
-                          className="text-sm md:text-base text-foreground/45 max-w-md"
-                        >
-                          {frame.sub}
-                        </motion.p>
-                      </motion.div>
-                    </AnimatePresence>
-
-                    {/* Bottom controls */}
-                    <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 w-full max-w-sm px-4">
-                      {/* Progress segments */}
-                      <div className="flex items-center gap-1.5 w-full">
-                        {frames.map((_, i) => (
-                          <div
-                            key={i}
-                            className="flex-1 h-1 rounded-full bg-foreground/10 overflow-hidden cursor-pointer"
-                            onClick={() => { setActiveFrame(i); setIsPlaying(true); }}
-                          >
-                            {i < activeFrame ? (
-                              <div className="h-full w-full bg-gradient-to-r from-neon-cyan to-neon-magenta rounded-full" />
-                            ) : i === activeFrame ? (
-                              <motion.div
-                                className="h-full bg-gradient-to-r from-neon-cyan to-neon-magenta rounded-full"
-                                initial={{ width: "0%" }}
-                                animate={{ width: "100%" }}
-                                transition={{ duration: FRAME_DURATION / 1000, ease: "linear" }}
-                                key={`progress-${activeFrame}-${Date.now()}`}
-                              />
-                            ) : null}
-                          </div>
-                        ))}
+                {/* Bottom: horizontal ticker — infinite scroll */}
+                <div className="relative overflow-hidden">
+                  <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[hsl(225,25%,3%)] to-transparent z-10 pointer-events-none" />
+                  <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[hsl(225,25%,3%)] to-transparent z-10 pointer-events-none" />
+                  <motion.div
+                    className="flex items-center gap-6 md:gap-10 whitespace-nowrap"
+                    animate={{ x: ["0%", "-50%"] }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  >
+                    {[...Array(2)].map((_, rep) => (
+                      <div key={rep} className="flex items-center gap-6 md:gap-10">
+                        <span className="text-neon-cyan/25 font-display text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Видеоуроки</span>
+                        <span className="text-neon-magenta/20">◆</span>
+                        <span className="text-neon-magenta/25 font-display text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Живые разборы</span>
+                        <span className="text-neon-cyan/20">◆</span>
+                        <span className="text-neon-cyan/25 font-display text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Toolkit</span>
+                        <span className="text-neon-magenta/20">◆</span>
+                        <span className="text-neon-magenta/25 font-display text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Чек-листы</span>
+                        <span className="text-neon-cyan/20">◆</span>
+                        <span className="text-neon-cyan/25 font-display text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Сертификат</span>
+                        <span className="text-neon-magenta/20">◆</span>
+                        <span className="text-neon-magenta/25 font-display text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Практика</span>
+                        <span className="text-neon-cyan/20">◆</span>
+                        <span className="text-neon-cyan/25 font-display text-xs md:text-sm font-bold uppercase tracking-[0.3em]">Бессрочный доступ</span>
+                        <span className="text-neon-magenta/20">◆</span>
                       </div>
-
-                      {/* Play/pause */}
-                      <button
-                        onClick={() => setIsPlaying(p => !p)}
-                        className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/30 hover:text-foreground/60 transition-colors"
-                      >
-                        {isPlaying ? "⏸ пауза" : "▶ играть"}
-                      </button>
-                    </div>
-                  </div>
-                )}
+                    ))}
+                  </motion.div>
+                </div>
               </div>
             </section>
           );
         };
 
-        return <PromoTrailer />;
+        return <PromoBanner />;
       })()}
 
       {/* Intro / Description */}
