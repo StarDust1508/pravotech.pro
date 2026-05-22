@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#101c30"/>
+      <stop offset="100%" stop-color="#050810"/>
+    </radialGradient>
+
+    <radialGradient id="cyanAura" cx="50%" cy="35%" r="45%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#00ffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="magAura" cx="55%" cy="65%" r="40%">
+      <stop offset="0%" stop-color="#ff00ff" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#ff00ff" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="shieldFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#ff00ff" stop-opacity="0.08"/>
+    </linearGradient>
+
+    <linearGradient id="shieldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffff"/>
+      <stop offset="60%" stop-color="#00ccdd"/>
+      <stop offset="100%" stop-color="#cc44ff"/>
+    </linearGradient>
+
+    <linearGradient id="scaleColor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffff"/>
+      <stop offset="100%" stop-color="#66ffff"/>
+    </linearGradient>
+
+    <linearGradient id="nodeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff55ff"/>
+      <stop offset="100%" stop-color="#cc00ff"/>
+    </linearGradient>
+
+    <filter id="glow16" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feFlood flood-color="#00ffff" flood-opacity="0.35"/>
+      <feComposite in2="b" operator="in" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="glow8" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feFlood flood-color="#00ffff" flood-opacity="0.4"/>
+      <feComposite in2="b" operator="in" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="magGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feFlood flood-color="#ff00ff" flood-opacity="0.5"/>
+      <feComposite in2="b" operator="in" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="innerShadow">
+      <feGaussianBlur stdDeviation="20" result="b"/>
+      <feFlood flood-color="#000" flood-opacity="0.4"/>
+      <feComposite in2="b" operator="in"/>
+      <feComposite in2="SourceGraphic" operator="atop"/>
+    </filter>
+
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="256"/>
+    </clipPath>
+  </defs>
+
+  <!-- Base -->
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="256" fill="url(#cyanAura)"/>
+  <circle cx="256" cy="256" r="256" fill="url(#magAura)"/>
+
+  <!-- Subtle grid -->
+  <g clip-path="url(#circleClip)" opacity="0.035">
+    <line x1="0" y1="64" x2="512" y2="64" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="0" y1="128" x2="512" y2="128" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="0" y1="192" x2="512" y2="192" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="0" y1="256" x2="512" y2="256" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="0" y1="320" x2="512" y2="320" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="0" y1="384" x2="512" y2="384" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="0" y1="448" x2="512" y2="448" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="64" y1="0" x2="64" y2="512" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="128" y1="0" x2="128" y2="512" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="192" y1="0" x2="192" y2="512" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="256" y1="0" x2="256" y2="512" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="320" y1="0" x2="320" y2="512" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="384" y1="0" x2="384" y2="512" stroke="#00ffff" stroke-width="0.5"/>
+    <line x1="448" y1="0" x2="448" y2="512" stroke="#00ffff" stroke-width="0.5"/>
+  </g>
+
+  <!-- Shield — bold, clean -->
+  <g filter="url(#glow16)">
+    <path d="M256 82 L370 148 L370 295 Q370 370 256 420 Q142 370 142 295 L142 148 Z"
+          fill="url(#shieldFill)"
+          stroke="url(#shieldStroke)"
+          stroke-width="3"
+          stroke-linejoin="round"/>
+  </g>
+
+  <!-- Shield inner bevel -->
+  <path d="M256 100 L358 160 L358 290 Q358 358 256 404 Q154 358 154 290 L154 160 Z"
+        fill="none"
+        stroke="#00ffff"
+        stroke-width="0.8"
+        stroke-linejoin="round"
+        opacity="0.12"/>
+
+  <!-- === SCALES OF JUSTICE — bold, geometric === -->
+  <g filter="url(#glow8)">
+    <!-- Central pillar — thick, strong -->
+    <rect x="251" y="155" width="10" height="170" rx="5" fill="url(#scaleColor)"/>
+
+    <!-- Top crossbeam — heavy -->
+    <rect x="178" y="178" width="156" height="8" rx="4" fill="url(#scaleColor)"/>
+
+    <!-- Top ornament circle -->
+    <circle cx="256" cy="158" r="12" fill="none" stroke="url(#scaleColor)" stroke-width="3"/>
+    <circle cx="256" cy="158" r="5" fill="#00ffff"/>
+
+    <!-- Left chain -->
+    <rect x="185" y="186" width="4" height="55" rx="2" fill="#00dddd"/>
+
+    <!-- Left bowl — arc -->
+    <path d="M162 241 Q170 270 187 275 Q204 270 212 241"
+          fill="none" stroke="#00ffff" stroke-width="4" stroke-linecap="round"/>
+    <!-- Left bowl bottom fill -->
+    <path d="M165 243 Q170 268 187 273 Q204 268 209 243"
+          fill="#00ffff" fill-opacity="0.08"/>
+
+    <!-- Right chain -->
+    <rect x="323" y="186" width="4" height="55" rx="2" fill="#00dddd"/>
+
+    <!-- Right bowl — arc -->
+    <path d="M300 241 Q308 270 325 275 Q342 270 350 241"
+          fill="none" stroke="#00ffff" stroke-width="4" stroke-linecap="round"/>
+    <!-- Right bowl bottom fill -->
+    <path d="M303 243 Q308 268 325 273 Q342 268 347 243"
+          fill="#00ffff" fill-opacity="0.08"/>
+
+    <!-- Base platform -->
+    <rect x="218" y="322" width="76" height="8" rx="4" fill="url(#scaleColor)"/>
+
+    <!-- Base pedestal -->
+    <path d="M232 330 L230 355 L282 355 L280 330"
+          fill="url(#scaleColor)" opacity="0.7"/>
+
+    <!-- Bottom line -->
+    <rect x="222" y="355" width="68" height="6" rx="3" fill="url(#scaleColor)"/>
+  </g>
+
+  <!-- === AI NEURAL OVERLAY === -->
+  <g filter="url(#magGlow)">
+    <!-- Primary nodes -->
+    <circle cx="256" cy="140" r="5" fill="#ff44ff"/>
+    <circle cx="220" cy="205" r="4" fill="#ff44ff"/>
+    <circle cx="292" cy="205" r="4" fill="#ff44ff"/>
+    <circle cx="256" cy="260" r="4.5" fill="#ff44ff"/>
+    <circle cx="230" cy="300" r="3.5" fill="#ff44ff"/>
+    <circle cx="282" cy="300" r="3.5" fill="#ff44ff"/>
+    <circle cx="256" cy="345" r="4" fill="#ff44ff"/>
+
+    <!-- Neural connections -->
+    <line x1="256" y1="140" x2="220" y2="205" stroke="#ff44ff" stroke-width="1.2" opacity="0.5"/>
+    <line x1="256" y1="140" x2="292" y2="205" stroke="#ff44ff" stroke-width="1.2" opacity="0.5"/>
+    <line x1="220" y1="205" x2="256" y2="260" stroke="#ff44ff" stroke-width="1" opacity="0.4"/>
+    <line x1="292" y1="205" x2="256" y2="260" stroke="#ff44ff" stroke-width="1" opacity="0.4"/>
+    <line x1="220" y1="205" x2="292" y2="205" stroke="#ff44ff" stroke-width="0.8" opacity="0.25"/>
+    <line x1="256" y1="260" x2="230" y2="300" stroke="#ff44ff" stroke-width="0.8" opacity="0.35"/>
+    <line x1="256" y1="260" x2="282" y2="300" stroke="#ff44ff" stroke-width="0.8" opacity="0.35"/>
+    <line x1="230" y1="300" x2="256" y2="345" stroke="#ff44ff" stroke-width="0.8" opacity="0.3"/>
+    <line x1="282" y1="300" x2="256" y2="345" stroke="#ff44ff" stroke-width="0.8" opacity="0.3"/>
+  </g>
+
+  <!-- Outer decorative arcs -->
+  <path d="M100 180 A200 200 0 0 1 256 56" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.1"/>
+  <path d="M412 332 A200 200 0 0 1 256 456" fill="none" stroke="#ff00ff" stroke-width="0.8" opacity="0.08"/>
+
+  <!-- Corner brackets -->
+  <g opacity="0.15">
+    <path d="M68 90 L90 90 L90 68" fill="none" stroke="#00ffff" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M444 90 L422 90 L422 68" fill="none" stroke="#00ffff" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M68 422 L90 422 L90 444" fill="none" stroke="#ff00ff" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M444 422 L422 422 L422 444" fill="none" stroke="#ff00ff" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

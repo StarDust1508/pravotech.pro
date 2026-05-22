@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import { rateLimit } from '../middleware/rate-limit.js';
 
 const router = Router();
 
@@ -22,8 +23,8 @@ function createSession(): string {
   return token;
 }
 
-// POST /auth/login
-router.post('/login', (req: Request, res: Response) => {
+// POST /auth/login — 5 попыток в минуту на IP
+router.post('/login', rateLimit(5, 60_000), (req: Request, res: Response) => {
   const { password } = req.body;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
@@ -31,7 +32,15 @@ router.post('/login', (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Admin password not configured' });
   }
 
-  if (!password || password !== adminPassword) {
+  if (!password || typeof password !== 'string') {
+    return res.status(401).json({ error: 'Invalid password' });
+  }
+
+  const a = Buffer.from(password, 'utf8');
+  const b = Buffer.from(adminPassword, 'utf8');
+  const match = a.length === b.length && crypto.timingSafeEqual(a, b);
+
+  if (!match) {
     return res.status(401).json({ error: 'Invalid password' });
   }
 

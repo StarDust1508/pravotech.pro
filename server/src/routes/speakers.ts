@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth } from './auth.js';
 import { query } from '../db.js';
 
 const router = Router();
@@ -32,7 +33,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create speaker
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const { full_name, position, company, bio, photo_url, stream, talk_title, talk_description, display_order, is_published } = req.body;
     const result = await query(
@@ -47,7 +48,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update speaker
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { full_name, position, company, bio, photo_url, stream, talk_title, talk_description, display_order, is_published } = req.body;
     const result = await query(
@@ -64,7 +65,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // PATCH toggle publish
-router.patch('/:id/publish', async (req, res) => {
+router.patch('/:id/publish', requireAuth, async (req, res) => {
   try {
     const { is_published } = req.body;
     const result = await query(
@@ -79,7 +80,7 @@ router.patch('/:id/publish', async (req, res) => {
 });
 
 // DELETE speaker
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const result = await query('DELETE FROM speakers WHERE id=$1 RETURNING id', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Speaker not found' });

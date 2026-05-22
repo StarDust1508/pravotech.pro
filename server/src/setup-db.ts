@@ -76,7 +76,7 @@ async function setupDatabase() {
         await client.query(`INSERT INTO ${SCHEMA}._migrations (name) VALUES ($1)`, [file]);
         console.log(`✅ ${file} executed successfully`);
       } catch (migErr) {
-        console.error(`❌ Error in ${file}:`, migErr.message);
+        console.error(`❌ Error in ${file}:`, migErr instanceof Error ? migErr.message : migErr);
         throw migErr;
       }
     }
@@ -94,7 +94,7 @@ async function setupDatabase() {
     client.release();
     await pool.end();
   } catch (err) {
-    console.error('❌ Error:', err.message);
+    console.error('❌ Error:', err instanceof Error ? err.message : err);
     await pool.end();
     throw err;
   }

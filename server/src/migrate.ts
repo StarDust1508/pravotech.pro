@@ -21,7 +21,14 @@ async function getExecutedMigrations(): Promise<string[]> {
   return result.rows.map((r: { name: string }) => r.name);
 }
 
+async function ensureSchema() {
+  // Создаём целевую схему, чтобы таблицы не уехали в public на чистой БД.
+  const schema = (process.env.DATABASE_SCHEMA || 'pravo').replace(/[^a-zA-Z0-9_]/g, '');
+  await query(`CREATE SCHEMA IF NOT EXISTS ${schema}`);
+}
+
 async function runMigrations(includeSeed: boolean) {
+  await ensureSchema();
   await ensureMigrationsTable();
   const executed = await getExecutedMigrations();
 

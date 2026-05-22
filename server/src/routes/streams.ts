@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth } from './auth.js';
 import { query } from '../db.js';
 
 const router = Router();
@@ -20,7 +21,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST create stream
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const { title, description, icon, display_order, is_highlighted, is_published } = req.body;
     const result = await query(
@@ -35,7 +36,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update stream
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { title, description, icon, display_order, is_highlighted, is_published } = req.body;
     const result = await query(
@@ -52,7 +53,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE stream
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const result = await query('DELETE FROM streams WHERE id=$1 RETURNING id', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Stream not found' });

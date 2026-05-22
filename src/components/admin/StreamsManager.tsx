@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Radio, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 import type { Stream } from "@/lib/api";
@@ -79,61 +79,115 @@ export function StreamsManager() {
     }
   };
 
-  if (loading) return <p className="text-muted-foreground">Загрузка...</p>;
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="flex items-center gap-3 text-muted-foreground">
+        <div className="w-5 h-5 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin" />
+        <span className="text-sm">Загрузка потоков...</span>
+      </div>
+    </div>
+  );
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Потоки ({streams.length})</h2>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-neon-cyan/10 flex items-center justify-center">
+            <Radio className="w-4.5 h-4.5 text-neon-cyan" />
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-bold">Потоки</h2>
+            <p className="text-xs text-muted-foreground">{streams.length} {streams.length === 1 ? "поток" : "потоков"}</p>
+          </div>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreate}><Plus className="w-4 h-4 mr-2" /> Добавить</Button>
+            <Button onClick={openCreate} className="bg-neon-cyan text-background hover:bg-neon-cyan/90 font-bold text-xs uppercase tracking-wider">
+              <Plus className="w-4 h-4 mr-1.5" /> Добавить
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingStream ? "Редактировать поток" : "Новый поток"}</DialogTitle>
+              <DialogTitle className="font-display">{editingStream ? "Редактировать поток" : "Новый поток"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div><Label>Название *</Label><Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} /></div>
-              <div><Label>Описание</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} /></div>
+              <div><Label className="text-xs">Название *</Label><Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} className="mt-1" /></div>
+              <div><Label className="text-xs">Описание</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="mt-1" /></div>
               <div>
-                <Label>Иконка</Label>
-                <div className="flex flex-wrap gap-2 mt-1">
+                <Label className="text-xs">Иконка</Label>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
                   {ICONS.map(icon => (
-                    <Button key={icon} variant={form.icon === icon ? "default" : "outline"} size="sm" onClick={() => setForm(p => ({ ...p, icon }))}>{icon}</Button>
+                    <button
+                      key={icon}
+                      onClick={() => setForm(p => ({ ...p, icon }))}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        form.icon === icon
+                          ? "bg-neon-cyan/15 text-neon-cyan border border-neon-cyan/30"
+                          : "bg-muted/50 text-muted-foreground border border-transparent hover:border-border"
+                      }`}
+                    >
+                      {icon}
+                    </button>
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><Label>Порядок</Label><Input type="number" value={form.display_order} onChange={e => setForm(p => ({ ...p, display_order: parseInt(e.target.value) || 0 }))} /></div>
-              </div>
+              <div><Label className="text-xs">Порядок</Label><Input type="number" value={form.display_order} onChange={e => setForm(p => ({ ...p, display_order: parseInt(e.target.value) || 0 }))} className="mt-1" /></div>
               <div className="flex gap-6">
-                <div className="flex items-center gap-2"><Switch checked={form.is_highlighted} onCheckedChange={v => setForm(p => ({ ...p, is_highlighted: v }))} /><Label>Выделен</Label></div>
-                <div className="flex items-center gap-2"><Switch checked={form.is_published} onCheckedChange={v => setForm(p => ({ ...p, is_published: v }))} /><Label>Опубликован</Label></div>
+                <div className="flex items-center gap-2"><Switch checked={form.is_highlighted} onCheckedChange={v => setForm(p => ({ ...p, is_highlighted: v }))} /><Label className="text-xs">Выделен</Label></div>
+                <div className="flex items-center gap-2"><Switch checked={form.is_published} onCheckedChange={v => setForm(p => ({ ...p, is_published: v }))} /><Label className="text-xs">Опубликован</Label></div>
               </div>
-              <Button onClick={handleSave} className="w-full">Сохранить</Button>
+              <Button onClick={handleSave} className="w-full bg-neon-cyan text-background hover:bg-neon-cyan/90 font-bold">Сохранить</Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
-        {streams.map(s => (
-          <Card key={s.id} className={!s.is_published ? "opacity-50" : ""}>
-            <CardContent className="flex items-center gap-4 p-4">
-              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-xs font-mono">{s.icon}</div>
-              <div className="flex-1">
-                <p className="font-bold">{s.title} {s.is_highlighted && <span className="text-neon-magenta text-xs">★ выделен</span>}</p>
-                <p className="text-sm text-muted-foreground">{s.description}</p>
-              </div>
+      <div className="space-y-2">
+        {streams.map((s, i) => (
+          <div
+            key={s.id}
+            className={`group flex items-center gap-4 p-4 rounded-xl border bg-card/50 hover:bg-card transition-all ${
+              !s.is_published ? "opacity-50 border-border" : s.is_highlighted ? "border-neon-magenta/30 hover:border-neon-magenta/50" : "border-border hover:border-neon-cyan/30"
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-mono font-bold ${
+              s.is_highlighted ? "bg-neon-magenta/10 text-neon-magenta" : "bg-muted/80 text-muted-foreground"
+            }`}>
+              {s.icon?.substring(0, 2) || (i + 1)}
+            </div>
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(s)}><Pencil className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(s.id)}><Trash2 className="w-4 h-4 text-red-500" /></Button>
+                <p className="font-display font-bold text-sm">{s.title}</p>
+                {s.is_highlighted && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-neon-magenta/10 text-neon-magenta uppercase tracking-wider">
+                    <Sparkles className="w-3 h-3" /> Выделен
+                  </span>
+                )}
+                {!s.is_published && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-muted text-muted-foreground uppercase tracking-wider">Черновик</span>
+                )}
               </div>
-            </CardContent>
-          </Card>
+              {s.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{s.description}</p>}
+            </div>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button onClick={() => openEdit(s)} className="p-2 rounded-lg hover:bg-muted/80 transition-colors text-muted-foreground hover:text-foreground">
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button onClick={() => handleDelete(s.id)} className="p-2 rounded-lg hover:bg-red-500/10 transition-colors text-muted-foreground hover:text-red-400">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         ))}
-        {streams.length === 0 && <p className="text-muted-foreground text-center py-8">Потоков пока нет</p>}
+        {streams.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
+              <Radio className="w-7 h-7 text-muted-foreground/50" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">Потоков пока нет</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">Нажмите «Добавить» чтобы создать первый поток</p>
+          </div>
+        )}
       </div>
     </div>
   );

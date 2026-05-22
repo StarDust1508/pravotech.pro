@@ -1,106 +1,96 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Mic2 } from "lucide-react";
 import { api, type Speaker } from "@/lib/api";
+import { TechCard } from "@/components/ui/TechCard";
 
 export function SpeakersSection() {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadSpeakers = async () => {
-      try {
-        const data = await api.speakers.list(true); // только опубликованные
-        setSpeakers(data.sort((a, b) => a.display_order - b.display_order));
-      } catch (error) {
-        console.error('Ошибка загрузки спикеров:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadSpeakers();
+    api.speakers
+      .list(true)
+      .then((data) => setSpeakers(data.sort((a, b) => a.display_order - b.display_order)))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <div className="text-muted-foreground">Загрузка спикеров...</div>
-        </div>
-      </section>
-    );
-  }
-
-  if (speakers.length === 0) {
-    return null; // не показываем секцию если спикеров нет
-  }
+  if (loading || speakers.length === 0) return null;
 
   return (
-    <section id="speakers" className="py-20 px-4 bg-gradient-to-br from-background to-muted/20">
-      <div className="container mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4">
-            <span className="text-neon-cyan">Спикеры</span> Конференции
+    <section id="speakers" className="py-14 scroll-mt-16">
+      <div className="container">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-2xl mb-12"
+        >
+          <div className="text-neon-cyan text-[10px] font-bold uppercase tracking-[0.3em] mb-4">
+            Эксперты индустрии
+          </div>
+          <h2 className="font-display text-3xl md:text-5xl font-black mb-5 uppercase leading-[1.05]">
+            Спикеры
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Ведущие эксперты в области права и технологий поделятся своим опытом и знаниями
+          <p className="text-foreground/60 text-base md:text-lg leading-relaxed">
+            Ведущие эксперты в области LegalTech, арбитражного управления и ИИ поделятся практическим опытом.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {speakers.map((speaker) => (
-            <Card key={speaker.id} className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-neon-cyan/20">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  {speaker.photo_url ? (
-                    <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-neon-cyan/20 group-hover:border-neon-cyan/40 transition-colors">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {speakers.map((speaker, i) => (
+            <motion.div
+              key={speaker.id}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <TechCard className="h-full">
+                <div className="p-5 flex flex-col h-full">
+                  <div className="flex items-start gap-4 mb-4">
+                    {speaker.photo_url ? (
                       <img
                         src={speaker.photo_url}
                         alt={speaker.full_name}
-                        className="w-full h-full object-cover"
+                        className="w-16 h-16 rounded-xl object-cover ring-2 ring-white/[0.06] group-hover:ring-neon-cyan/30 transition-all flex-shrink-0"
                       />
-                    </div>
-                  ) : (
-                    <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center border-4 border-neon-cyan/20 group-hover:border-neon-cyan/40 transition-colors">
-                      <span className="text-4xl font-bold text-neon-cyan">
+                    ) : (
+                      <div className="w-16 h-16 rounded-xl bg-neon-cyan/10 flex items-center justify-center text-neon-cyan font-display font-black text-xl flex-shrink-0">
                         {speaker.full_name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <h3 className="font-display text-sm font-bold leading-tight">{speaker.full_name}</h3>
+                      {speaker.position && (
+                        <p className="text-xs text-neon-cyan mt-0.5">{speaker.position}</p>
+                      )}
+                      {speaker.company && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{speaker.company}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {speaker.talk_title && (
+                    <div className="flex-1">
+                      <div className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                        <Mic2 className="w-3.5 h-3.5 text-neon-cyan mt-0.5 flex-shrink-0" />
+                        <p className="text-xs leading-relaxed text-foreground/75">{speaker.talk_title}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {speaker.stream && (
+                    <div className="mt-3">
+                      <span className="inline-block px-2 py-0.5 rounded-md bg-neon-cyan/8 text-neon-cyan text-[10px] font-bold uppercase tracking-wider">
+                        {speaker.stream}
                       </span>
                     </div>
                   )}
-                  
-                  <h3 className="text-xl font-bold mb-2">{speaker.full_name}</h3>
-                  
-                  {speaker.position && (
-                    <p className="text-neon-cyan font-medium mb-1">
-                      {speaker.position}
-                    </p>
-                  )}
-                  
-                  {speaker.company && (
-                    <p className="text-muted-foreground mb-4">
-                      {speaker.company}
-                    </p>
-                  )}
-                  
-                  {speaker.talk_title && (
-                    <div className="mb-4 p-3 bg-muted rounded-lg">
-                      <h4 className="text-sm font-semibold text-neon-cyan mb-2">
-                        Доклад:
-                      </h4>
-                      <p className="text-sm">
-                        {speaker.talk_title}
-                      </p>
-                    </div>
-                  )}
-                  
-                  {speaker.stream && (
-                    <div className="inline-block px-3 py-1 bg-neon-cyan/10 text-neon-cyan rounded-full text-sm font-medium">
-                      {speaker.stream}
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+              </TechCard>
+            </motion.div>
           ))}
         </div>
       </div>

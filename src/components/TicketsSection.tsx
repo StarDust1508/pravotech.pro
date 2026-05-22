@@ -149,7 +149,7 @@ export function TicketsSection() {
   };
 
   return (
-    <section id="tickets" className="py-20 scroll-mt-16">
+    <section id="tickets" className="py-14 scroll-mt-16">
       <div className="container">
         {/* Header */}
         <motion.div
@@ -170,39 +170,90 @@ export function TicketsSection() {
         </motion.div>
 
         {/* Individual tariffs */}
-        <div className="grid md:grid-cols-3 gap-5 mb-5">
+        <div className="grid md:grid-cols-3 gap-5 mb-5" style={{ perspective: "1200px" }}>
           {tickets.map((ticket, i) => {
             const isFeatured = ticket.tier === "featured";
-            const accentColor = isFeatured ? "magenta" : ticket.tier === "business" ? "cyan" : "muted";
+            const isBusiness = ticket.tier === "business";
+            const accentColor = isFeatured ? "magenta" : isBusiness ? "cyan" : "muted";
 
             return (
               <motion.div
                 key={ticket.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, rotateX: 5 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className={`relative flex flex-col p-7 md:p-8 rounded-2xl bg-card/80 backdrop-blur-sm transition-colors ${
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                className={`group relative flex flex-col rounded-2xl overflow-hidden ${
                   isFeatured
-                    ? "border border-neon-magenta/50 shadow-[0_0_40px_-10px_rgba(255,0,255,0.25)] lg:-translate-y-2"
-                    : ticket.tier === "business"
-                      ? "border border-neon-cyan/25"
-                      : "border border-border"
+                    ? "lg:-translate-y-3"
+                    : ""
                 }`}
+                style={{
+                  boxShadow: isFeatured
+                    ? "0 25px 60px -15px rgba(255,0,255,0.2), 0 0 40px -10px rgba(255,0,255,0.15), inset 0 1px 0 rgba(255,255,255,0.06)"
+                    : isBusiness
+                      ? "0 20px 50px -15px rgba(0,0,0,0.5), 0 0 30px -10px rgba(0,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.04)"
+                      : "0 15px 40px -15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)",
+                }}
               >
+                {/* Background */}
+                <div className={`absolute inset-0 ${
+                  isFeatured
+                    ? "bg-gradient-to-b from-[#1a0a1e] via-[#12101e] to-[#0c0e18]"
+                    : "bg-gradient-to-b from-[#0e1520] via-[#0c1220] to-[#0a0e18]"
+                }`} />
+
+                {/* Ambient glows */}
+                {isFeatured && (
+                  <>
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,0,255,0.12),transparent_60%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,255,255,0.06),transparent_50%)]" />
+                  </>
+                )}
+                {isBusiness && (
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,255,255,0.08),transparent_60%)]" />
+                )}
+
+                {/* Top accent line */}
+                <div className={`absolute top-0 left-0 right-0 h-[2px] ${
+                  isFeatured
+                    ? "bg-gradient-to-r from-neon-magenta/60 via-neon-magenta/80 to-neon-cyan/40"
+                    : isBusiness
+                      ? "bg-gradient-to-r from-neon-cyan/40 via-neon-cyan/60 to-transparent"
+                      : "bg-gradient-to-r from-white/10 via-white/5 to-transparent"
+                }`} />
+
+                {/* Border */}
+                <div className={`absolute inset-0 rounded-2xl border ${
+                  isFeatured
+                    ? "border-neon-magenta/30"
+                    : isBusiness
+                      ? "border-neon-cyan/20"
+                      : "border-white/[0.08]"
+                }`} />
+
+                {/* Holographic shimmer for featured */}
+                {isFeatured && (
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(105deg, transparent 40%, rgba(255,0,255,0.06) 45%, rgba(0,255,255,0.06) 50%, rgba(255,0,255,0.06) 55%, transparent 60%)",
+                      backgroundSize: "200% 100%",
+                      animation: "shimmer 3s ease-in-out infinite",
+                    }}
+                  />
+                )}
+
                 {/* Recommended badge */}
                 {ticket.recommended && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-neon-magenta text-primary-foreground text-[10px] font-black uppercase tracking-[0.25em] shadow-neon-magenta whitespace-nowrap">
-                    Рекомендуемый
+                  <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 z-10">
+                    <div className="px-4 py-1.5 rounded-b-lg bg-gradient-to-r from-neon-magenta to-neon-magenta/80 text-primary-foreground text-[9px] font-black uppercase tracking-[0.3em] shadow-lg shadow-neon-magenta/30 whitespace-nowrap">
+                      Рекомендуемый
+                    </div>
                   </div>
                 )}
 
-                {/* Subtle glow bg for featured */}
-                {isFeatured && (
-                  <div className="absolute inset-0 bg-gradient-to-b from-neon-magenta/[0.06] to-transparent rounded-2xl pointer-events-none" />
-                )}
-
-                <div className="relative flex flex-col flex-1">
+                <div className="relative flex flex-col flex-1 p-7 md:p-8">
                   {/* Eyebrow */}
                   <div
                     className={`text-[10px] font-bold uppercase tracking-[0.25em] mb-3 ${
@@ -222,12 +273,14 @@ export function TicketsSection() {
                   </h3>
 
                   {/* Audience */}
-                  <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{ticket.audience}</p>
+                  <p className="text-foreground/50 text-sm mb-6 leading-relaxed">{ticket.audience}</p>
 
                   {/* Includes prev */}
                   {ticket.includesPrev && (
-                    <div className="inline-flex items-center gap-2 text-xs font-medium text-foreground/50 mb-5 pb-5 border-b border-border">
-                      <ArrowRight size={12} className="text-foreground/30" />
+                    <div className={`inline-flex items-center gap-2 text-xs font-medium mb-5 pb-5 border-b ${
+                      isFeatured ? "text-neon-magenta/50 border-neon-magenta/15" : "text-foreground/40 border-white/[0.06]"
+                    }`}>
+                      <ArrowRight size={12} />
                       {ticket.includesPrev}
                     </div>
                   )}
@@ -235,14 +288,14 @@ export function TicketsSection() {
                   {/* Features */}
                   <ul className="space-y-2.5 mb-8 flex-1">
                     {ticket.features.map((feature, j) => (
-                      <li key={j} className="flex items-start gap-2.5 text-sm text-foreground/75 leading-relaxed">
+                      <li key={j} className="flex items-start gap-2.5 text-sm text-foreground/70 leading-relaxed">
                         <Check
                           className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
                             accentColor === "magenta"
                               ? "text-neon-magenta"
                               : accentColor === "cyan"
                                 ? "text-neon-cyan"
-                                : "text-foreground/40"
+                                : "text-foreground/30"
                           }`}
                         />
                         <span>{feature}</span>
@@ -250,26 +303,34 @@ export function TicketsSection() {
                     ))}
                   </ul>
 
-                  {/* Pricing */}
-                  <div className="mb-5">
+                  {/* Pricing block */}
+                  <div className={`p-4 rounded-xl mb-5 ${
+                    isFeatured
+                      ? "bg-neon-magenta/[0.06] border border-neon-magenta/15"
+                      : isBusiness
+                        ? "bg-neon-cyan/[0.04] border border-neon-cyan/10"
+                        : "bg-white/[0.02] border border-white/[0.05]"
+                  }`}>
                     <div className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 mb-1.5 font-medium">
                       Специальная цена
                     </div>
                     {ticket.oldPrice && (
-                      <div className="text-xs text-foreground/30 line-through mb-1">{ticket.oldPrice}</div>
+                      <div className="text-xs text-foreground/25 line-through mb-1">{ticket.oldPrice}</div>
                     )}
-                    <div className="font-display text-3xl md:text-4xl font-black leading-none">{ticket.price}</div>
+                    <div className={`font-display text-3xl md:text-4xl font-black leading-none ${
+                      isFeatured ? "bg-gradient-to-r from-neon-magenta to-neon-cyan bg-clip-text text-transparent" : ""
+                    }`}>{ticket.price}</div>
                   </div>
 
                   {/* CTA */}
                   <button
                     onClick={() => openPurchaseDialog({ name: ticket.name, priceRaw: ticket.priceRaw })}
-                    className={`w-full px-6 py-3.5 font-display font-bold rounded-lg transition-all text-sm uppercase tracking-wider ${
+                    className={`w-full px-6 py-3.5 font-display font-bold rounded-lg text-sm uppercase tracking-wider transition-all ${
                       isFeatured
-                        ? "bg-neon-magenta text-primary-foreground shadow-neon-magenta hover:opacity-90"
-                        : ticket.tier === "business"
-                          ? "border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 hover:border-neon-cyan"
-                          : "border border-foreground/20 text-foreground/80 hover:border-foreground/40 hover:text-foreground"
+                        ? "bg-gradient-to-r from-neon-magenta to-neon-magenta/80 text-primary-foreground shadow-lg shadow-neon-magenta/25 hover:shadow-neon-magenta/40 hover:scale-[1.02]"
+                        : isBusiness
+                          ? "border border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10 hover:border-neon-cyan hover:shadow-lg hover:shadow-neon-cyan/10"
+                          : "border border-white/[0.12] text-foreground/70 hover:border-white/[0.25] hover:text-foreground"
                     }`}
                   >
                     Оставить заявку

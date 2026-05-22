@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronLeft, ChevronRight, GraduationCap, BookOpen, Users, CheckCircle2, Star, X, ArrowRight, Scale, Briefcase, Shield, FileText, Award, Monitor, Video, ClipboardCheck, ListChecks, BookMarked, UserPlus, TrendingUp, Building2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
+import { ChevronDown, ChevronLeft, ChevronRight, GraduationCap, BookOpen, Users, CheckCircle2, Star, X, ArrowRight, Scale, Briefcase, Shield, FileText, Award, Monitor, Video, ClipboardCheck, ListChecks, BookMarked, UserPlus, TrendingUp, Building2, Play, Zap, Lock, Unlock, Clock, Target, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { api } from "@/lib/api";
-import type { AcademyCourse, AcademyTeacher, AcademyReview } from "@/lib/api";
+import type { AcademyCourse, AcademyTeacher, AcademyReview, Purchase, User } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import neosvobozhdenieHero from "@/assets/hero-image1.png";
 import yuridicheskieAspektyHero from "@/assets/hero-image2.png";
@@ -235,6 +235,35 @@ const richToolkit: Record<string, ToolkitItem[]> = {
       desc: "Единые стандарты проверки работы и формирования обратной связи команде.",
     },
   ],
+  "prodazhi-yuridicheskih-uslug": [
+    {
+      icon: ClipboardCheck,
+      title: "Сценарий консультации и продажи",
+      desc: "Полный сценарий первой встречи с клиентом: от открытия до подписания договора.",
+      featured: true,
+    },
+    {
+      icon: Shield,
+      title: "Скрипты работы с возражениями",
+      desc: "Отработанные заготовки под цену, страхи и сравнение с конкурентами.",
+      featured: true,
+    },
+    {
+      icon: TrendingUp,
+      title: "Шаблон воронки и метрик",
+      desc: "Ключевые показатели продаж — видно, где падает конверсия и что чинить.",
+    },
+    {
+      icon: BookMarked,
+      title: "Система касаний и рекомендаций",
+      desc: "Сценарии повторных контактов после договора и стабильный поток рекомендаций.",
+    },
+    {
+      icon: ListChecks,
+      title: "Чек-листы до и после встречи",
+      desc: "Регламент подготовки и разбор встречи — клиент не теряется на следующем шаге.",
+    },
+  ],
 };
 
 const richToolkitSubtitles: Record<string, string> = {
@@ -244,10 +273,13 @@ const richToolkitSubtitles: Record<string, string> = {
     "Набор рабочих инструментов оспаривания — от диагностики и матрицы риска до готовых списков доказательств по типам сделок.",
   "effektivnaya-komanda":
     "Рабочий набор для руководителя — от карты ролей и регламентов найма до KPI, ритуалов и стандартов обратной связи.",
+  "prodazhi-yuridicheskih-uslug":
+    "Рабочий sales-набор для консультанта и руководителя — от сценария встречи и возражений до воронки, касаний и рекомендаций.",
 };
 
 const richToolkitHeadings: Record<string, string> = {
   "effektivnaya-komanda": "Toolkit для сборки команды",
+  "prodazhi-yuridicheskih-uslug": "Sales-toolkit для внедрения",
 };
 
 const richPracticeTasks: Record<string, string[]> = {
@@ -260,15 +292,27 @@ const richPracticeTasks: Record<string, string[]> = {
     "Сценарий ритуалов команды и обратной связи",
     "Финальная сборка системы управления командой",
   ],
+  "prodazhi-yuridicheskih-uslug": [
+    "Диагностика воронки и точек потери клиентов",
+    "Смыслы и позиционирование услуги под клиента в долгах",
+    "Сценарий доверительной продажи и работа с возражениями",
+    "Инфолиния клиента: материалы, упаковка и точки касания",
+    "Карта длинных касаний после договора",
+    "Панель метрик и управление конверсией",
+    "Агентская система: клиенты приводят клиентов",
+  ],
 };
 
 const richPracticeHeadings: Record<string, string> = {
   "effektivnaya-komanda": "Что вы соберёте на курсе",
+  "prodazhi-yuridicheskih-uslug": "Что вы соберёте на курсе",
 };
 
 const richPracticeSubtitles: Record<string, string> = {
   "effektivnaya-komanda":
     "Вы не просто проходите уроки — собираете конкретные управленческие решения. На выходе — рабочая система управления командой, готовая к внедрению.",
+  "prodazhi-yuridicheskih-uslug":
+    "Семь шагов внедрения, которые вы проходите на курсе. На выходе — собранная под вашу практику система продаж.",
 };
 
 interface FormatItem {
@@ -344,6 +388,28 @@ const richFormat: Record<string, FormatItem[]> = {
       desc: "Итоговое тестирование и документ о повышении квалификации.",
     },
   ],
+  "prodazhi-yuridicheskih-uslug": [
+    {
+      icon: Monitor,
+      title: "Онлайн в своём темпе",
+      desc: "С любого устройства. Доступ к материалам без ограничения по времени.",
+    },
+    {
+      icon: Video,
+      title: "Видеоуроки + живые разборы",
+      desc: "Теория в записи, разборы сложных встреч на онлайн-сессиях с экспертами. Записи сохраняются.",
+    },
+    {
+      icon: ClipboardCheck,
+      title: "Взял — внедрил — продал",
+      desc: "Каждый модуль собирает конкретный элемент системы продаж для вашей практики.",
+    },
+    {
+      icon: Award,
+      title: "Аттестация и удостоверение",
+      desc: "Итоговое тестирование и документ о повышении квалификации.",
+    },
+  ],
 };
 
 interface ProgramPhase {
@@ -380,6 +446,11 @@ const richProgramPhases: Record<string, ProgramPhase[]> = {
     { name: "Управление", desc: "Контроль, KPI, обратная связь", lessonRange: [9, 11] },
     { name: "Система", desc: "Управленческий уровень + сборка", lessonRange: [12, 14] },
   ],
+  "prodazhi-yuridicheskih-uslug": [
+    { name: "Клиент", desc: "Кому и что продаём", lessonRange: [1, 2] },
+    { name: "Доверие и путь", desc: "Как подвести к договору", lessonRange: [3, 4] },
+    { name: "Масштаб", desc: "Дорогие продажи и система", lessonRange: [5, 6] },
+  ],
 };
 
 const richProgramSubtitles: Record<string, string> = {
@@ -389,6 +460,8 @@ const richProgramSubtitles: Record<string, string> = {
     "Полный маршрут по оспариванию сделок в БФЛ — от оснований и типологии сделок до процесса, стратегий сторон и практики.",
   "effektivnaya-komanda":
     "Системный маршрут построения управляемой команды — от диагностики и ролей к найму, управлению, KPI и финальной сборке системы.",
+  "prodazhi-yuridicheskih-uslug":
+    "Концентрированный маршрут продаж в юридической нише — от понимания клиента и доверия до дорогих сделок и длинной системы рекомендаций.",
 };
 
 interface RichModule {
@@ -487,6 +560,41 @@ const richProgramModules: Record<string, RichModule[]> = {
       desc: "Типовые провалы практики и как их обойти на старте дела.",
     },
   ],
+  "prodazhi-yuridicheskih-uslug": [
+    {
+      category: "Психология",
+      title: "Клиент в долгах",
+      desc: "Страхи, триггеры и уровень доверия. Как клиент принимает решение под давлением обстоятельств.",
+      core: true,
+    },
+    {
+      category: "Доверие",
+      title: "Система доверительной продажи",
+      desc: "Что превращает консультацию в договор — без давления, скидок и агрессивной воронки.",
+      core: true,
+    },
+    {
+      category: "Путь клиента",
+      title: "Маршрут: аудит → встреча → договор",
+      desc: "Чёткая механика движения клиента с измеримыми точками конверсии.",
+      core: true,
+    },
+    {
+      category: "Упаковка",
+      title: "Упаковка экспертизы",
+      desc: "Офис, презентация, внешняя среда — что клиент видит до разговора. Работает за вас или против.",
+    },
+    {
+      category: "Метрики",
+      title: "Управление конверсией",
+      desc: "Воронка, ключевые цифры и точки роста — видно, где теряется клиент.",
+    },
+    {
+      category: "Касания",
+      title: "Длинные касания и рекомендации",
+      desc: "Работа с клиентом после договора: повторные обращения и стабильный поток рекомендаций.",
+    },
+  ],
 };
 
 const richLearningResults: Record<string, RichLearningItem[]> = {
@@ -555,6 +663,41 @@ const richLearningResults: Record<string, RichLearningItem[]> = {
       icon: FileText,
       title: "Готовые регламенты и процессы",
       desc: "Найм, адаптация, KPI, обратная связь — единый стандарт работы команды.",
+    },
+    {
+      icon: Award,
+      title: "Удостоверение о повышении квалификации",
+      desc: "Официальный документ после итогового тестирования.",
+    },
+  ],
+  "prodazhi-yuridicheskih-uslug": [
+    {
+      icon: Shield,
+      title: "Система доверительных продаж",
+      desc: "Клиент приходит готовый действовать. Без давления, скидок и гонки по цене.",
+      featured: true,
+    },
+    {
+      icon: ListChecks,
+      title: "Путь от аудита до договора",
+      desc: "Аудит → встреча → договор. Каждый шаг с понятной логикой и метриками.",
+      featured: true,
+    },
+    {
+      icon: TrendingUp,
+      title: "Клиенты приводят клиентов",
+      desc: "Повторные касания и рекомендации. Договор становится началом, а не концом воронки.",
+      featured: true,
+    },
+    {
+      icon: ClipboardCheck,
+      title: "Контроль конверсии",
+      desc: "Воронка, ключевые цифры, узкие места. Видно, где и что улучшать.",
+    },
+    {
+      icon: FileText,
+      title: "Готовые сценарии и скрипты",
+      desc: "Встречи, возражения, чек-листы — применимы сразу после курса.",
     },
     {
       icon: Award,
@@ -775,6 +918,18 @@ export default function CoursePage() {
   const [formDone, setFormDone] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "" });
 
+  // Purchase flow state
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [purchaseStatus, setPurchaseStatus] = useState<'none' | 'pending' | 'paid'>('none');
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+  const [purchaseMessage, setPurchaseMessage] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
+  const [authForm, setAuthForm] = useState({ email: '', password: '', name: '', phone: '' });
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const courseNavigate = useNavigate();
+
   useEffect(() => {
     if (!slug) return;
     const load = async () => {
@@ -820,6 +975,120 @@ export default function CoursePage() {
     setShowForm(true);
     setFormDone(false);
     setForm({ name: "", phone: "", email: "" });
+  };
+
+  // Check user auth & purchase status
+  useEffect(() => {
+    const token = localStorage.getItem('user_token');
+    if (!token) return;
+    api.userAuth.me().then((u) => {
+      setCurrentUser(u);
+      // Check purchases
+      api.purchases.my().then((purchases) => {
+        if (course) {
+          const match = purchases.find((p) => p.course_id === course.id);
+          if (match) {
+            setPurchaseStatus(match.status === 'paid' ? 'paid' : 'pending');
+          }
+        }
+      }).catch(() => {});
+    }).catch(() => {
+      localStorage.removeItem('user_token');
+    });
+  }, [course]);
+
+  const handlePurchase = async () => {
+    if (!course) return;
+
+    // If not logged in, show auth modal
+    if (!currentUser) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    // If already paid, navigate to learn page
+    if (purchaseStatus === 'paid') {
+      courseNavigate(`/courses/${slug}/learn`);
+      return;
+    }
+
+    // If already pending — try to pay again via YooKassa
+    // Create payment and redirect to YooKassa
+    setPurchaseLoading(true);
+    try {
+      const { confirmationUrl } = await api.payments.create(course.id);
+      if (confirmationUrl) {
+        window.location.href = confirmationUrl;
+      } else {
+        setPurchaseMessage('Не удалось создать платёж. Попробуйте позже или свяжитесь с нами: pravotechhub@mail.ru');
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Ошибка создания платежа';
+      setPurchaseMessage(msg);
+    } finally {
+      setPurchaseLoading(false);
+    }
+  };
+
+  const handleCourseAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError(null);
+    try {
+      let result;
+      if (authTab === 'register') {
+        result = await api.userAuth.register({
+          email: authForm.email,
+          password: authForm.password,
+          name: authForm.name || undefined,
+          phone: authForm.phone || undefined,
+        });
+      } else {
+        result = await api.userAuth.login({
+          email: authForm.email,
+          password: authForm.password,
+        });
+      }
+      localStorage.setItem('user_token', result.token);
+      setCurrentUser(result.user);
+      setShowAuthModal(false);
+      // After auth, auto-trigger purchase
+      if (course) {
+        setPurchaseLoading(true);
+        try {
+          const purchases = await api.purchases.my();
+          const match = purchases.find((p) => p.course_id === course.id);
+          if (match) {
+            setPurchaseStatus(match.status === 'paid' ? 'paid' : 'pending');
+            if (match.status === 'paid') {
+              courseNavigate(`/courses/${slug}/learn`);
+            } else {
+              // Pending — redirect to YooKassa to complete payment
+              const { confirmationUrl } = await api.payments.create(course.id);
+              if (confirmationUrl) {
+                window.location.href = confirmationUrl;
+                return;
+              }
+            }
+          } else {
+            // Redirect to YooKassa payment
+            const { confirmationUrl } = await api.payments.create(course.id);
+            if (confirmationUrl) {
+              window.location.href = confirmationUrl;
+              return;
+            }
+          }
+        } catch {
+          // Purchase creation can fail silently here
+        } finally {
+          setPurchaseLoading(false);
+        }
+      }
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Ошибка авторизации');
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   if (loading) {
@@ -877,15 +1146,29 @@ export default function CoursePage() {
   const courseTeachers = filteredTeachers;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
 
-      {/* Hero */}
+      {/* Hero — Vibrant & Juicy */}
       <section className="pt-28 pb-16 relative overflow-hidden">
         {(() => {
           const heroImg = slug ? courseHeroImages[slug] : null;
           if (!heroImg) {
-            return <div className="absolute inset-0 bg-gradient-to-b from-neon-magenta/5 to-transparent" />;
+            return (
+              <div className="absolute inset-0">
+                <div className="absolute inset-0 bg-gradient-to-b from-neon-magenta/8 via-background to-transparent" />
+                <motion.div
+                  className="absolute top-20 right-[10%] w-[500px] h-[500px] rounded-full bg-neon-magenta/[0.06] blur-[100px]"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute bottom-0 left-[5%] w-[400px] h-[400px] rounded-full bg-neon-cyan/[0.05] blur-[80px]"
+                  animate={{ scale: [1.1, 0.9, 1.1], opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                />
+              </div>
+            );
           }
           return (
             <div className="absolute inset-0">
@@ -899,8 +1182,17 @@ export default function CoursePage() {
                 style={{ background: "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background) / 0.6) 55%, hsl(var(--background)) 100%)" }}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
-              <div className="absolute top-0 right-0 w-96 h-96 bg-neon-magenta/[0.04] rounded-full blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-neon-cyan/[0.04] rounded-full blur-3xl" />
+              {/* Animated glow orbs */}
+              <motion.div
+                className="absolute top-10 right-[10%] w-96 h-96 bg-neon-magenta/[0.07] rounded-full blur-3xl"
+                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute bottom-0 left-[5%] w-64 h-64 bg-neon-cyan/[0.06] rounded-full blur-3xl"
+                animate={{ scale: [1.1, 0.8, 1.1], opacity: [0.4, 0.7, 0.4] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+              />
             </div>
           );
         })()}
@@ -945,35 +1237,221 @@ export default function CoursePage() {
 
             {/* Decision zone — split-pill */}
             <div className="flex flex-col items-center">
-              <button
-                onClick={openFormModal}
-                className="group inline-flex items-stretch rounded-2xl border border-neon-magenta/30 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-neon-magenta/60 transition-colors"
-              >
-                {price > 0 && (
-                  <>
-                    <div className="flex flex-col justify-center px-5 md:px-6 py-3.5 text-left">
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/45 mb-1 font-medium">
-                        Полная стоимость
-                      </span>
-                      <span className="font-display text-xl md:text-2xl font-black text-foreground leading-none">
-                        {price.toLocaleString("ru-RU")} ₽
-                      </span>
-                    </div>
-                    <div className="w-px bg-white/[0.08]" />
-                  </>
-                )}
-                <div className="flex items-center gap-2 px-6 md:px-7 bg-neon-magenta text-primary-foreground font-display font-bold text-sm uppercase tracking-wider group-hover:bg-neon-magenta/90 transition-colors">
-                  Оставить заявку
+              {purchaseStatus === 'paid' ? (
+                <button
+                  onClick={() => courseNavigate(`/courses/${slug}/learn`)}
+                  className="group inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-neon-cyan text-primary-foreground font-display font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity shadow-lg shadow-neon-cyan/25"
+                >
+                  <GraduationCap size={18} />
+                  Перейти к урокам
                   <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={handlePurchase}
+                    disabled={purchaseLoading}
+                    className="group inline-flex items-stretch rounded-2xl border border-neon-magenta/30 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-neon-magenta/60 transition-colors disabled:opacity-50 shadow-lg shadow-neon-magenta/10 hover:shadow-neon-magenta/20"
+                  >
+                    {price > 0 && (
+                      <>
+                        <div className="flex flex-col justify-center px-5 md:px-6 py-3.5 text-left">
+                          <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/45 mb-1 font-medium">
+                            Полная стоимость
+                          </span>
+                          <span className="font-display text-xl md:text-2xl font-black text-foreground leading-none">
+                            {price.toLocaleString("ru-RU")} ₽
+                          </span>
+                        </div>
+                        <div className="w-px bg-white/[0.08]" />
+                      </>
+                    )}
+                    <div className="flex items-center gap-2 px-6 md:px-7 bg-neon-magenta text-primary-foreground font-display font-bold text-sm uppercase tracking-wider group-hover:bg-neon-magenta/90 transition-colors">
+                      {purchaseLoading ? 'Подождите...' : purchaseStatus === 'pending' ? 'Оплатить курс' : (course.cta_button_text || 'Купить курс')}
+                      <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </button>
+                  <button
+                    onClick={openFormModal}
+                    className="text-xs text-foreground/40 hover:text-neon-cyan transition-colors underline underline-offset-2 mt-2"
+                  >
+                    Или оставить заявку на консультацию
+                  </button>
+                </>
+              )}
+              {purchaseMessage && (
+                <div className="mt-2 p-3 rounded-lg bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-sm max-w-md text-center">
+                  {purchaseMessage}
                 </div>
-              </button>
-              <p className="text-[11px] text-foreground/40 mt-3 text-center">
-                Оплата удобным способом · менеджер свяжется для деталей
-              </p>
+              )}
+              {purchaseStatus !== 'paid' && !purchaseMessage && (
+                <p className="text-[11px] text-foreground/40 mt-3 text-center">
+                  Безопасная оплата через ЮKassa · Мгновенный доступ после оплаты
+                </p>
+              )}
             </div>
           </motion.div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════
+          ANIMATED PROMO — 8-second "trailer" loop
+          Cycles through 4 slides with course highlights
+          ═══════════════════════════════════════════════════ */}
+      {(() => {
+        const totalLessonsCount = course.lessons?.length || 12;
+        const promoSlides = [
+          {
+            icon: Play,
+            number: totalLessonsCount,
+            suffix: "",
+            label: totalLessonsCount >= 14 ? "занятий" : "занятий",
+            sub: "Видеоуроки · живые разборы · практика",
+            gradient: "from-neon-cyan/20 via-neon-cyan/5 to-transparent",
+            accent: "neon-cyan",
+          },
+          {
+            icon: Target,
+            number: 100,
+            suffix: "%",
+            label: "практики",
+            sub: "Реальные кейсы · чек-листы · toolkit",
+            gradient: "from-neon-magenta/20 via-neon-magenta/5 to-transparent",
+            accent: "neon-magenta",
+          },
+          {
+            icon: Award,
+            number: 0,
+            suffix: "",
+            label: "Удостоверение",
+            sub: "Повышение квалификации · итоговый тест",
+            gradient: "from-neon-cyan/15 via-neon-magenta/10 to-transparent",
+            accent: "neon-cyan",
+          },
+          {
+            icon: Unlock,
+            number: 0,
+            suffix: "",
+            label: "Мгновенный доступ",
+            sub: "Оплатите — начинайте учиться прямо сейчас",
+            gradient: "from-neon-magenta/15 via-neon-cyan/10 to-transparent",
+            accent: "neon-magenta",
+          },
+        ];
+
+        return (
+          <section className="relative overflow-hidden border-t border-border">
+            {/* Animated background pulse */}
+            <div className="absolute inset-0">
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-neon-cyan/[0.03] via-transparent to-neon-magenta/[0.03]"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {/* Scanning line effect */}
+              <motion.div
+                className="absolute top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-neon-cyan/40 to-transparent"
+                animate={{ left: ["-5%", "105%"] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+
+            <div className="container relative z-10 py-8 md:py-10">
+              {/* Mini label */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <motion.div
+                  className="w-2 h-2 rounded-full bg-neon-cyan"
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-neon-cyan/80">
+                  О курсе за 8 секунд
+                </span>
+                <motion.div
+                  className="w-2 h-2 rounded-full bg-neon-magenta"
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                />
+              </div>
+
+              {/* Promo slides — horizontal scroll on mobile, grid on desktop */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                {promoSlides.map((slide, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.15, duration: 0.5, type: "spring" }}
+                    className="relative group"
+                  >
+                    <div className={`relative overflow-hidden rounded-xl border bg-card/80 backdrop-blur-sm p-5 md:p-6 h-full transition-all duration-300 ${
+                      slide.accent === "neon-cyan"
+                        ? "border-neon-cyan/20 hover:border-neon-cyan/50 hover:shadow-[0_0_30px_-5px_rgba(0,255,255,0.2)]"
+                        : "border-neon-magenta/20 hover:border-neon-magenta/50 hover:shadow-[0_0_30px_-5px_rgba(255,51,153,0.2)]"
+                    }`}>
+                      {/* Background gradient */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+
+                      <div className="relative z-10">
+                        {/* Icon with pulse */}
+                        <motion.div
+                          className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 md:mb-4 ${
+                            slide.accent === "neon-cyan"
+                              ? "border border-neon-cyan/30 bg-neon-cyan/10"
+                              : "border border-neon-magenta/30 bg-neon-magenta/10"
+                          }`}
+                          animate={{ scale: [1, 1.05, 1] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
+                        >
+                          <slide.icon className={`w-5 h-5 md:w-6 md:h-6 ${
+                            slide.accent === "neon-cyan" ? "text-neon-cyan" : "text-neon-magenta"
+                          }`} strokeWidth={1.75} />
+                        </motion.div>
+
+                        {/* Number or label */}
+                        {slide.number > 0 ? (
+                          <div className="mb-1">
+                            <span className={`font-display text-3xl md:text-4xl font-black leading-none ${
+                              slide.accent === "neon-cyan" ? "text-neon-cyan" : "text-neon-magenta"
+                            }`}>
+                              {slide.number}
+                            </span>
+                            {slide.suffix && (
+                              <span className={`font-display text-xl md:text-2xl font-black ${
+                                slide.accent === "neon-cyan" ? "text-neon-cyan/70" : "text-neon-magenta/70"
+                              }`}>
+                                {slide.suffix}
+                              </span>
+                            )}
+                          </div>
+                        ) : null}
+                        <div className="font-display text-sm md:text-base font-black leading-tight mb-1.5">
+                          {slide.label}
+                        </div>
+                        <p className="text-[11px] md:text-xs text-foreground/50 leading-relaxed">
+                          {slide.sub}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Progress bar — 8-second loop */}
+              <div className="mt-6 flex items-center justify-center">
+                <div className="w-full max-w-md h-0.5 bg-foreground/10 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-neon-cyan via-neon-magenta to-neon-cyan rounded-full"
+                    animate={{ width: ["0%", "100%"] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Intro / Description */}
       {(() => {
@@ -1166,7 +1644,9 @@ export default function CoursePage() {
                   <p className="text-foreground/55 text-sm md:text-base leading-relaxed">
                     {slug === "effektivnaya-komanda"
                       ? "Что меняется в работе руководителя и команды после курса — конкретные результаты уже в первые недели."
-                      : "Прикладные результаты курса — работают в практике с первого дня после обучения."}
+                      : slug === "prodazhi-yuridicheskih-uslug"
+                        ? "Что меняется в продажах после курса — система, которая работает без давления и зависимости от харизмы."
+                        : "Прикладные результаты курса — работают в практике с первого дня после обучения."}
                   </p>
                 </motion.div>
 
@@ -1263,6 +1743,8 @@ export default function CoursePage() {
           const subtitleMap: Record<string, string> = {
             "osparivanie-sdelok":
               "Шесть модулей программы — от теории оспаривания и аудита сделок до кейсов и разбора типовых ошибок.",
+            "prodazhi-yuridicheskih-uslug":
+              "Шесть блоков программы — от психологии клиента и доверия до упаковки, метрик и длинных касаний.",
           };
           const subtitle = (slug && subtitleMap[slug])
             || (count >= 6
@@ -2136,32 +2618,67 @@ export default function CoursePage() {
               </div>
 
               {/* Decision zone — split-pill */}
-              <div className="flex flex-col items-center">
-                <button
-                  onClick={openFormModal}
-                  className="group inline-flex items-stretch rounded-2xl border border-neon-magenta/30 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-neon-magenta/60 transition-colors"
-                >
-                  {price > 0 && (
-                    <>
-                      <div className="flex flex-col justify-center px-5 md:px-6 py-3.5 text-left">
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/45 mb-1 font-medium">
-                          Полная стоимость
-                        </span>
-                        <span className="font-display text-xl md:text-2xl font-black text-foreground leading-none">
-                          {price.toLocaleString("ru-RU")} ₽
-                        </span>
-                      </div>
-                      <div className="w-px bg-white/[0.08]" />
-                    </>
-                  )}
-                  <div className="flex items-center gap-2 px-6 md:px-7 bg-neon-magenta text-primary-foreground font-display font-bold text-sm uppercase tracking-wider group-hover:bg-neon-magenta/90 transition-colors">
-                    {course.cta_button_text || "Оставить заявку"}
+              <div id="buy" className="flex flex-col items-center gap-3">
+                {purchaseStatus === 'paid' ? (
+                  <button
+                    onClick={() => courseNavigate(`/courses/${slug}/learn`)}
+                    className="group inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-neon-cyan text-primary-foreground font-display font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity shadow-lg shadow-neon-cyan/25"
+                  >
+                    <GraduationCap size={18} />
+                    Перейти к урокам
                     <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handlePurchase}
+                      disabled={purchaseLoading}
+                      className="group inline-flex items-stretch rounded-2xl border border-neon-magenta/30 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-neon-magenta/60 transition-colors disabled:opacity-50"
+                    >
+                      {price > 0 && (
+                        <>
+                          <div className="flex flex-col justify-center px-5 md:px-6 py-3.5 text-left">
+                            <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/45 mb-1 font-medium">
+                              Полная стоимость
+                            </span>
+                            <span className="font-display text-xl md:text-2xl font-black text-foreground leading-none">
+                              {price.toLocaleString("ru-RU")} ₽
+                            </span>
+                          </div>
+                          <div className="w-px bg-white/[0.08]" />
+                        </>
+                      )}
+                      <div className="flex items-center gap-2 px-6 md:px-7 bg-neon-magenta text-primary-foreground font-display font-bold text-sm uppercase tracking-wider group-hover:bg-neon-magenta/90 transition-colors">
+                        {purchaseLoading ? 'Подождите...' : purchaseStatus === 'pending' ? 'Оплатить курс' : (course.cta_button_text || 'Купить курс')}
+                        <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </button>
+                    <button
+                      onClick={openFormModal}
+                      className="text-sm text-foreground/50 hover:text-neon-cyan transition-colors underline underline-offset-2"
+                    >
+                      Или оставить заявку на консультацию
+                    </button>
+                  </>
+                )}
+                {purchaseMessage && (
+                  <div className="mt-2 p-3 rounded-lg bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-sm max-w-md text-center">
+                    {purchaseMessage}
                   </div>
-                </button>
-                <p className="text-[11px] text-foreground/40 mt-4 leading-relaxed max-w-sm">
-                  Менеджер свяжется в течение рабочего дня, вышлет программу и обсудит формат
-                </p>
+                )}
+                {purchaseStatus !== 'paid' && !purchaseMessage && (
+                  <p className="text-[11px] text-foreground/40 mt-1 leading-relaxed max-w-sm">
+                    Безопасная оплата через ЮKassa · Мгновенный доступ после оплаты
+                  </p>
+                )}
+                {/* Link to lessons — always visible */}
+                <Link
+                  to={`/courses/${slug}/learn`}
+                  className="mt-2 text-xs text-foreground/40 hover:text-neon-cyan transition-colors inline-flex items-center gap-1"
+                >
+                  Перейти к урокам
+                  <ArrowRight size={12} />
+                </Link>
               </div>
             </div>
           </motion.div>
@@ -2320,6 +2837,42 @@ export default function CoursePage() {
         </div>
       </footer>
 
+      {/* ═══════════════════════════════════════
+          STICKY MOBILE CTA BAR
+          Shows on mobile after scrolling past hero
+          ═══════════════════════════════════════ */}
+      {purchaseStatus !== 'paid' && (
+        <motion.div
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+        >
+          <div className="bg-card/95 backdrop-blur-xl border-t border-neon-magenta/20 px-4 py-3 safe-area-pb">
+            <div className="flex items-center gap-3">
+              {price > 0 && (
+                <div className="flex flex-col shrink-0">
+                  <span className="text-[9px] uppercase tracking-wider text-foreground/40 font-medium">Цена</span>
+                  <span className="font-display text-lg font-black text-foreground leading-none">
+                    {price.toLocaleString("ru-RU")} ₽
+                  </span>
+                </div>
+              )}
+              <button
+                onClick={handlePurchase}
+                disabled={purchaseLoading}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-xl text-sm uppercase tracking-wider hover:bg-neon-magenta/90 transition-colors disabled:opacity-50 shadow-lg shadow-neon-magenta/25"
+              >
+                {purchaseLoading ? 'Подождите...' : purchaseStatus === 'pending' ? 'Оплатить' : 'Купить курс'}
+                <ArrowRight size={14} />
+              </button>
+            </div>
+            <p className="text-[9px] text-foreground/30 text-center mt-1.5">
+              ЮKassa · Мгновенный доступ
+            </p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Registration Modal */}
       <AnimatePresence>
         {showForm && (
@@ -2374,6 +2927,85 @@ export default function CoursePage() {
                   </button>
                 </div>
               )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Auth Modal for Purchase */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShowAuthModal(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative bg-card border border-border rounded-2xl p-6 md:p-8 max-w-md w-full"
+            >
+              <button onClick={() => setShowAuthModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
+                <X size={20} />
+              </button>
+
+              <GraduationCap className="w-8 h-8 text-neon-cyan mb-3" />
+              <h3 className="font-display text-xl font-bold mb-1">Войдите для покупки</h3>
+              <p className="text-sm text-muted-foreground mb-6">Авторизуйтесь, чтобы оформить покупку курса</p>
+
+              {/* Tab buttons */}
+              <div className="flex gap-1 mb-6 bg-muted/50 rounded-lg p-1">
+                <button
+                  onClick={() => { setAuthTab('login'); setAuthError(null); }}
+                  className={`flex-1 py-2 rounded-md text-sm font-medium transition-all
+                    ${authTab === 'login' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  Вход
+                </button>
+                <button
+                  onClick={() => { setAuthTab('register'); setAuthError(null); }}
+                  className={`flex-1 py-2 rounded-md text-sm font-medium transition-all
+                    ${authTab === 'register' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  Регистрация
+                </button>
+              </div>
+
+              {authError && (
+                <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                  {authError}
+                </div>
+              )}
+
+              <form onSubmit={handleCourseAuth} className="space-y-4">
+                {authTab === 'register' && (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Имя</label>
+                      <input type="text" value={authForm.name} onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors" placeholder="Ваше имя" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Телефон</label>
+                      <input type="tel" value={authForm.phone} onChange={(e) => setAuthForm({ ...authForm, phone: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors" placeholder="+7 (___) ___-__-__" />
+                    </div>
+                  </>
+                )}
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Email <span className="text-neon-magenta">*</span></label>
+                  <input required type="email" value={authForm.email} onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors" placeholder="email@example.com" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Пароль <span className="text-neon-magenta">*</span></label>
+                  <input required type="password" minLength={6} value={authForm.password} onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                    placeholder={authTab === 'register' ? 'Минимум 6 символов' : 'Ваш пароль'} />
+                </div>
+                <button type="submit" disabled={authLoading}
+                  className="w-full px-6 py-3 bg-neon-cyan text-primary-foreground font-display font-bold rounded-lg hover:opacity-90 transition-opacity text-sm uppercase tracking-wider disabled:opacity-50">
+                  {authLoading ? 'Подождите...' : authTab === 'login' ? 'Войти и купить' : 'Зарегистрироваться и купить'}
+                </button>
+              </form>
             </motion.div>
           </motion.div>
         )}

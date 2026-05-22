@@ -1,0 +1,25 @@
+# Локальный PostgreSQL для разработки и проверки на localhost.
+# Запуск:  docker compose -f infra/docker-compose.yml up -d
+# Остановка: docker compose -f infra/docker-compose.yml down
+# После старта примените миграции: npm --prefix server run migrate
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pravo_tech_pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pravo
+      POSTGRES_PASSWORD: pravo
+      POSTGRES_DB: bankruptcy_academy
+    ports:
+      - "5432:5432"
+    volumes:
+      - pravo_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pravo -d bankruptcy_academy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pravo_pg_data:

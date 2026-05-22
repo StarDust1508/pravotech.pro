@@ -1,73 +1,66 @@
-# Welcome to your Lovable project
+# ТехнологИИ права
 
-## Project info
+Legal-Tech платформа о банкротстве физических лиц (БФЛ): аналитические исследования, чек-листы по арбитражному управлению, академия (курсы) и отраслевая конференция.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Стек
 
-## How can I edit this code?
+- Фронтенд: React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, TanStack Query, React Router, framer-motion, recharts
+- Бэкенд: Node.js, Express, PostgreSQL (node-postgres)
+- Аналитические отчёты в PDF готовятся отдельным скриптом-генератором (matplotlib + reportlab)
 
-There are several ways of editing your application.
+## Структура
 
-**Use Lovable**
+- `src/` — фронтенд (страницы в `src/pages`, секции и UI в `src/components`, API-клиент в `src/lib/api.ts`)
+- `server/` — Express API (роуты в `server/src/routes`)
+- `migrations/` — SQL-миграции (накатываются по порядку, отслеживаются в таблице `_migrations`)
+- `public/reports/` — PDF-файлы аналитических отчётов
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Локальный запуск
 
-Changes made via Lovable will be committed automatically to this repo.
+Требуется Node.js 18+ и PostgreSQL. Локально проще всего поднять БД через Docker.
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Локальный запуск НЕ требует прод-сервера и SSH-туннеля — используйте `*:local` команды.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 1. зависимости (включая server/)
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. локальный PostgreSQL в Docker (логин/пароль/БД заданы в команде)
+npm run db:local:up
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. применить миграции к локальной БД
+npm run migrate:local
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# 4. запуск фронта + API локально (без туннеля)
+npm run dev:local
 ```
 
-**Edit a file directly in GitHub**
+Открыть: **http://localhost:8080**. API — `:3001` (фронт проксирует `/api`). Админка — `/admin`, пароль `admin`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Остановить БД: `npm run db:local:down`.
 
-**Use GitHub Codespaces**
+> Команды `db:local:up`, `migrate:local`, `dev:local` подставляют локальные параметры БД сами — `.env` для локального запуска править не нужно. Нужен установленный Docker. Без Docker — поднимите свой PostgreSQL и пропишите `DATABASE_*` в `.env` (см. `.env.example`).
+>
+> Дефолтный `npm run dev` (с SSH-туннелем к удалённой БД) — для прод-окружения, локально он не нужен.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Полезные команды
 
-## What technologies are used for this project?
+```sh
+npm run build                   # сборка фронтенда + SEO-пререндер (tools/prerender.mjs)
+SITE_URL=https://домен npm run build   # сборка с реальным доменом для sitemap/OG
+npm run lint                    # ESLint
+npm run test                    # unit-тесты (Vitest)
+npm --prefix server run build   # сборка сервера
+```
 
-This project is built with:
+## Конфигурация
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Переменные окружения задаются в `.env` (см. `.env.example`): подключение к PostgreSQL (`DATABASE_*`), `DATABASE_SCHEMA` (по умолчанию `pravo`), `ADMIN_PASSWORD` для входа в `/admin`, `API_PORT`, `SITE_URL` для SEO-пререндера.
 
-## How can I deploy this project?
+## SEO
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+`npm run build` после сборки запускает `tools/prerender.mjs`: генерирует статические HTML с индивидуальными мета-тегами/OG для главной, конференции, лендингов и всех отчётов/чек-листов (slug'и берутся из миграций), плюс `sitemap.xml` и `robots.txt`. Домен берётся из `SITE_URL`.
 
-## Can I connect a custom domain to my Lovable project?
+## Контент через админку
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Раздел `/admin` (вход по паролю из `ADMIN_PASSWORD`) управляет спикерами, потоками, спонсорами, участниками, заявками, медиа, курсами академии, аналитическими отчётами и чек-листами.

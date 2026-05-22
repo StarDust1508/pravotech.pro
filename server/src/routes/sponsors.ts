@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth } from './auth.js';
 import { query } from '../db.js';
 
 const router = Router();
@@ -35,7 +36,7 @@ router.get('/tiers', async (_req, res) => {
 });
 
 // POST create sponsor
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const { company_name, logo_url, website_url, tier, display_order, is_published } = req.body;
     const result = await query(
@@ -50,7 +51,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update sponsor
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { company_name, logo_url, website_url, tier, display_order, is_published } = req.body;
     const result = await query(
@@ -67,7 +68,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // PUT update tier
-router.put('/tiers/:id', async (req, res) => {
+router.put('/tiers/:id', requireAuth, async (req, res) => {
   try {
     const { name, price, icon, perks } = req.body;
     const result = await query(
@@ -94,7 +95,7 @@ router.put('/tiers/:id', async (req, res) => {
 });
 
 // DELETE sponsor
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const result = await query('DELETE FROM sponsors WHERE id=$1 RETURNING id', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Sponsor not found' });

@@ -9,6 +9,9 @@ lerna-debug.log*
 
 node_modules
 dist
+dist_qa
+server/dist
+server/dist_qa
 dist-ssr
 *.local
 .env
@@ -25,3 +28,10 @@ scripts/
 *.njsproj
 *.sln
 *.sw?
+vite.config.ts.timestamp-*
+
+# Claude Code
+.claude/
+
+# Separate repos
+TechForum202x/

@@ -179,6 +179,131 @@ export interface AcademyReview {
   created_at: string;
 }
 
+export interface ResearchReport {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: string;
+  accent: string;
+  summary: string;
+  cover_image_url: string;
+  pdf_url: string;
+  pdf_media_id: string | null;
+  charts: ResearchChart[] | null;
+  display_order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ResearchChart {
+  type: "bar" | "barh" | "line" | "pie" | "steps";
+  title: string;
+  unit?: string;
+  note?: string;
+  data: { label: string; value?: number }[];
+}
+
+export interface TelegramPost {
+  id: number;
+  link: string;
+  text: string;
+  date: string;
+  photo: string | null;
+}
+
+export interface ChecklistPoint {
+  text: string;
+  hint?: string;
+}
+
+export interface ChecklistGroup {
+  group: string;
+  points: ChecklistPoint[];
+}
+
+export interface Checklist {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: string;
+  accent: string;
+  intro: string;
+  items: ChecklistGroup[] | null;
+  pdf_url: string;
+  display_order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// ─── User / Lesson types ─────────────────────────────────────────
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  phone: string;
+  role: string;
+  created_at?: string;
+}
+
+export interface Lesson {
+  id: number;
+  course_id: string;
+  title: string;
+  description: string;
+  duration_minutes: number;
+  display_order: number;
+  is_free: boolean;
+  has_test: boolean;
+  accessible: boolean;
+  video_token?: string | null;
+  presentation_url?: string | null;
+  test_data?: {
+    questions: {
+      question: string;
+      options: string[];
+      correct: number;
+    }[];
+  } | null;
+  progress?: LessonProgress | null;
+}
+
+export interface LessonProgress {
+  completed: boolean;
+  test_score: number | null;
+  test_answers: unknown[] | null;
+  watched_seconds: number;
+}
+
+export interface Purchase {
+  id: number;
+  user_id: number;
+  course_id: string;
+  status: 'pending' | 'paid' | 'refunded';
+  amount: number;
+  created_at: string;
+  course_title?: string;
+  course_slug?: string;
+}
+
+export interface TestResult {
+  score: number;
+  total: number;
+  correct: number;
+  results: {
+    question_index: number;
+    user_answer: number;
+    correct_answer: number;
+    is_correct: boolean;
+  }[];
+}
+
 export interface ResearchLead {
   id: string;
   name: string;
@@ -190,6 +315,7 @@ export interface ResearchLead {
   research_id: string;
   research_title: string;
   source_form: string;
+  delivery_channel: string;
   created_at: string;
 }
 
@@ -206,6 +332,23 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem('admin_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function getUserAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('user_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function userRequest<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    headers: { 'Content-Type': 'application/json', ...getUserAuthHeaders(), ...options?.headers },
+    ...options,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(body.error || `HTTP ${res.status}`);
+  }
+  return res.json();
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -317,6 +460,7 @@ export const api = {
       formData.append('file', file);
       const res = await fetch(`${API_URL}/media/upload`, {
         method: 'POST',
+        headers: { ...getAuthHeaders() },
         body: formData,
       });
       if (!res.ok) throw new Error('Upload failed');
@@ -327,6 +471,7 @@ export const api = {
       formData.append('file', file);
       const res = await fetch(`${API_URL}/media/upload-to-path`, {
         method: 'POST',
+        headers: { ...getAuthHeaders() },
         body: formData,
       });
       if (!res.ok) throw new Error('Upload failed');
@@ -376,5 +521,96 @@ export const api = {
 
     register: (data: { name: string; phone: string; email: string; course_id?: string; course_title?: string }) =>
       request('/academy/register', { method: 'POST', body: JSON.stringify(data) }),
+  },
+
+  research: {
+    reports: (all?: boolean) => request<ResearchReport[]>(`/research/reports${all ? '?all=true' : ''}`),
+    report: (slug: string) => request<ResearchReport>(`/research/reports/${slug}`),
+    createReport: (data: Partial<ResearchReport>) =>
+      request<ResearchReport>('/research/reports', { method: 'POST', body: JSON.stringify(data) }),
+    updateReport: (id: string, data: Partial<ResearchReport>) =>
+      request<ResearchReport>(`/research/reports/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteReport: (id: string) =>
+      request<{ success: boolean }>(`/research/reports/${id}`, { method: 'DELETE' }),
+    toggleReportPublish: (id: string, is_published: boolean) =>
+      request<ResearchReport>(`/research/reports/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+  },
+
+  telegram: {
+    feed: (channel?: string, limit = 4) => {
+      const params = new URLSearchParams();
+      if (channel) params.set('channel', channel);
+      params.set('limit', String(limit));
+      return request<{ channel: string; posts: TelegramPost[]; error?: string }>(`/telegram/feed?${params.toString()}`);
+    },
+  },
+
+  checklists: {
+    list: (all?: boolean) => request<Checklist[]>(`/checklists${all ? '?all=true' : ''}`),
+    get: (slug: string) => request<Checklist>(`/checklists/${slug}`),
+    create: (data: Partial<Checklist>) =>
+      request<Checklist>('/checklists', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: Partial<Checklist>) =>
+      request<Checklist>(`/checklists/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: string) =>
+      request<{ success: boolean }>(`/checklists/${id}`, { method: 'DELETE' }),
+    togglePublish: (id: string, is_published: boolean) =>
+      request<Checklist>(`/checklists/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+  },
+
+  userAuth: {
+    register: (data: { email: string; password: string; name?: string; phone?: string }) =>
+      userRequest<{ token: string; user: User }>('/user-auth/register', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    login: (data: { email: string; password: string }) =>
+      userRequest<{ token: string; user: User }>('/user-auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    me: () => userRequest<User>('/user-auth/me'),
+  },
+
+  lessons: {
+    list: (courseId: string) =>
+      userRequest<Lesson[]>(`/lessons/courses/${courseId}/lessons`),
+    get: (id: number) =>
+      userRequest<Lesson>(`/lessons/${id}`),
+    progress: (id: number, data: { watched_seconds?: number; completed?: boolean }) =>
+      userRequest<LessonProgress>(`/lessons/${id}/progress`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    submitTest: (id: number, answers: number[]) =>
+      userRequest<TestResult>(`/lessons/${id}/test`, {
+        method: 'POST',
+        body: JSON.stringify({ answers }),
+      }),
+  },
+
+  purchases: {
+    create: (courseId: string) =>
+      userRequest<Purchase>('/purchases', {
+        method: 'POST',
+        body: JSON.stringify({ courseId }),
+      }),
+    my: () => userRequest<Purchase[]>('/purchases/my'),
+    confirm: (id: number) =>
+      userRequest<Purchase>(`/purchases/${id}/confirm`, { method: 'POST' }),
+  },
+
+  payments: {
+    create: (courseId: string) =>
+      userRequest<{ confirmationUrl: string; paymentId: string }>('/payments/create', {
+        method: 'POST',
+        body: JSON.stringify({ courseId }),
+      }),
+    status: (purchaseId: number) =>
+      userRequest<{ status: string; paymentId: string | null }>(`/payments/status/${purchaseId}`),
+  },
+
+  video: {
+    getStreamUrl: (token: string) => `${API_URL}/video/${token}`,
   },
 };

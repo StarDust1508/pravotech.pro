@@ -115,7 +115,7 @@ export const SponsorForm = () => {
   };
 
   return (
-    <section id="sponsor-form" className="py-20 bg-muted/30 scroll-mt-16">
+    <section id="sponsor-form" className="py-14 bg-muted/30 scroll-mt-16">
       <div className="container max-w-6xl">
         {/* Header */}
         <motion.div
@@ -152,8 +152,8 @@ export const SponsorForm = () => {
           ))}
         </motion.div>
 
-        {/* Packages */}
-        <div className="grid md:grid-cols-3 gap-5 mb-14">
+        {/* Packages + Form in one grid */}
+        <div className="grid md:grid-cols-3 gap-5">
           {tiers.map((tier, i) => {
             const meta = tierMeta[i] ?? tierMeta[0];
             const isFeatured = meta.featured;
@@ -171,7 +171,6 @@ export const SponsorForm = () => {
                     : "border border-border"
                 }`}
               >
-                {/* Featured badge */}
                 {isFeatured && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-neon-magenta text-primary-foreground text-[10px] font-black uppercase tracking-[0.25em] whitespace-nowrap">
                     Генеральный
@@ -183,7 +182,6 @@ export const SponsorForm = () => {
                 )}
 
                 <div className="relative flex flex-col flex-1">
-                  {/* Tier label */}
                   <div
                     className={`text-[10px] font-bold uppercase tracking-[0.25em] mb-4 ${
                       meta.accent === "magenta" ? "text-neon-magenta" : "text-neon-cyan"
@@ -192,7 +190,6 @@ export const SponsorForm = () => {
                     {meta.label}
                   </div>
 
-                  {/* Icon + name */}
                   <div className="flex items-center gap-3 mb-2">
                     <tier.icon
                       className={`w-7 h-7 ${meta.accent === "magenta" ? "text-neon-magenta" : "text-neon-cyan"}`}
@@ -200,12 +197,10 @@ export const SponsorForm = () => {
                     <h3 className="font-display text-2xl md:text-3xl font-black leading-tight">{tier.name}</h3>
                   </div>
 
-                  {/* Price */}
                   <div className="font-display text-lg md:text-xl font-black text-foreground/90 mb-6">
                     {tier.price}
                   </div>
 
-                  {/* Perks */}
                   <ul className="space-y-3 flex-1">
                     {tier.perks.map((perk, j) => (
                       <li
@@ -225,30 +220,17 @@ export const SponsorForm = () => {
               </motion.div>
             );
           })}
-        </div>
 
-        {/* Bridge to form */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-2xl mx-auto text-center mb-6"
-        >
-          <div className="inline-flex items-center gap-3 text-foreground/40 text-xs font-medium uppercase tracking-[0.25em]">
-            <span className="w-8 h-px bg-border" />
-            Индивидуальные условия
-            <span className="w-8 h-px bg-border" />
-          </div>
-        </motion.div>
-
-        {/* Form */}
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          onSubmit={handleSubmit}
-          className="relative max-w-2xl mx-auto p-7 md:p-8 rounded-2xl border border-neon-magenta/25 bg-card/80 backdrop-blur-sm overflow-hidden"
-        >
+          {/* Form — fills remaining space in the grid */}
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            onSubmit={handleSubmit}
+            className={`relative flex flex-col p-7 md:p-8 rounded-2xl border border-neon-magenta/25 bg-card/80 backdrop-blur-sm overflow-hidden ${
+              tiers.length % 3 === 1 ? "md:col-span-2" : tiers.length % 3 === 0 ? "md:col-span-3" : ""
+            }`}
+          >
           <div className="absolute top-0 right-0 w-64 h-64 bg-neon-magenta/[0.05] rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative">
@@ -296,9 +278,11 @@ export const SponsorForm = () => {
                   <option value="" disabled>
                     Интересующий пакет
                   </option>
-                  <option value="silver">Серебро — от 300 000 ₽</option>
-                  <option value="gold">Золото — от 700 000 ₽</option>
-                  <option value="platinum">Платина — от 1 500 000 ₽</option>
+                  {tiers.map((t) => (
+                    <option key={t.name} value={t.name}>
+                      {t.name} — {t.price}
+                    </option>
+                  ))}
                   <option value="custom">Индивидуальный пакет</option>
                 </select>
               </div>
@@ -320,12 +304,11 @@ export const SponsorForm = () => {
 
             <p className="text-[11px] text-foreground/40 mt-4 text-center leading-relaxed">
               Или напрямую:{" "}
-              <span className="text-foreground/60 font-medium">+7 (495) 123-45-67</span>
-              {" · "}
-              <span className="text-foreground/60 font-medium">partnerships@pravo-tech.ru</span>
+              <a href="mailto:pravotechhub@mail.ru" className="text-foreground/60 font-medium hover:text-neon-cyan transition-colors">pravotechhub@mail.ru</a>
             </p>
           </div>
         </motion.form>
+        </div>
       </div>
     </section>
   );

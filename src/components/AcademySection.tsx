@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, X, Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { AcademyCourse } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import yuridicheskieAspektyHero from "@/assets/hero-image2.png";
 import neosvobozhdenieHero from "@/assets/hero-image1.png";
 import osparivanieHero from "@/assets/hero-image3.png";
@@ -38,18 +40,18 @@ const markers = ["Практика, а не теория", "Эксперты р�
 
 export const AcademySection = () => {
   const { toast } = useToast();
-  const [courses, setCourses] = useState<AcademyCourse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const userProfile = useUserProfile();
+  const { data: raw = [], isLoading: loading } = useQuery({
+    queryKey: ["academy-courses"],
+    queryFn: () => api.academy.courses(),
+    staleTime: 5 * 60 * 1000,
+  });
+  const courses = useMemo(
+    () => [...raw].sort((a: AcademyCourse, b: AcademyCourse) => a.display_order - b.display_order),
+    [raw]
+  );
   const [modalCourse, setModalCourse] = useState<AcademyCourse | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    api.academy
-      .courses()
-      .then((c) => setCourses([...c].sort((a, b) => a.display_order - b.display_order)))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -356,6 +358,7 @@ export const AcademySection = () => {
                   <input
                     required
                     name="name"
+                    defaultValue={userProfile.name}
                     placeholder="ФИО"
                     className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-magenta/60 transition-colors text-sm"
                   />
@@ -364,6 +367,7 @@ export const AcademySection = () => {
                       required
                       name="email"
                       type="email"
+                      defaultValue={userProfile.email}
                       placeholder="Email"
                       className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-magenta/60 transition-colors text-sm"
                     />
@@ -371,6 +375,7 @@ export const AcademySection = () => {
                       required
                       name="phone"
                       type="tel"
+                      defaultValue={userProfile.phone}
                       placeholder="Телефон"
                       className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-magenta/60 transition-colors text-sm"
                     />

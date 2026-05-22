@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth } from './auth.js';
 import { query } from '../db.js';
 
 const router = Router();
@@ -32,7 +33,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create participant
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const { company_name, logo_url, website_url, industry, description, display_order, is_published } = req.body;
     const result = await query(
@@ -47,7 +48,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update participant
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { company_name, logo_url, website_url, industry, description, display_order, is_published } = req.body;
     const result = await query(
@@ -64,7 +65,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // PATCH toggle publish
-router.patch('/:id/publish', async (req, res) => {
+router.patch('/:id/publish', requireAuth, async (req, res) => {
   try {
     const { is_published } = req.body;
     const result = await query(
@@ -79,7 +80,7 @@ router.patch('/:id/publish', async (req, res) => {
 });
 
 // DELETE participant
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const result = await query('DELETE FROM participants WHERE id=$1 RETURNING id', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Participant not found' });

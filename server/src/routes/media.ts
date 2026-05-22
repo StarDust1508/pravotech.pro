@@ -1,9 +1,12 @@
 import { Router } from 'express';
+import { requireAuth } from './auth.js';
 import multer from 'multer';
 import { query } from '../db.js';
 
 const allowedMimes = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/avif',
+  // Документы отчётов (PDF). Раздаются через /api/media/file/:id.
+  'application/pdf',
 ];
 
 // Memory storage — файл остаётся в буфере, затем сохраняется в PostgreSQL
@@ -14,7 +17,7 @@ const upload = multer({
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed'));
+      cb(new Error('Unsupported file type'));
     }
   },
 });
@@ -49,6 +52,7 @@ router.get('/file/:id', async (req, res) => {
       'Content-Type': file_type || 'application/octet-stream',
       'Content-Disposition': `inline; filename="${encodeURIComponent(file_name)}"`,
       'Cache-Control': 'public, max-age=31536000, immutable',
+      'X-Content-Type-Options': 'nosniff',
     });
     res.send(file_data);
   } catch (err) {
@@ -57,7 +61,7 @@ router.get('/file/:id', async (req, res) => {
 });
 
 // POST upload file — сохраняет в PostgreSQL
-router.post('/upload', upload.single('file'), async (req, res) => {
+router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file provided' });
 
@@ -80,7 +84,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 // POST upload to path (simpler response) — тоже через PostgreSQL
-router.post('/upload-to-path', upload.single('file'), async (req, res) => {
+router.post('/upload-to-path', requireAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file provided' });
 
@@ -101,7 +105,7 @@ router.post('/upload-to-path', upload.single('file'), async (req, res) => {
 });
 
 // DELETE media (удаляет запись из БД, файл хранится в БД — удалится вместе с записью)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const result = await query('DELETE FROM media WHERE id=$1 RETURNING id', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Media not found' });

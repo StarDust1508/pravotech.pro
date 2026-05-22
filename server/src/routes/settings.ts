@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth } from './auth.js';
 import { query } from '../db.js';
 
 const router = Router();
@@ -18,7 +19,7 @@ router.get('/', async (_req, res) => {
 });
 
 // PUT upsert setting
-router.put('/:key', async (req, res) => {
+router.put('/:key', requireAuth, async (req, res) => {
   try {
     const { value } = req.body;
     const result = await query(

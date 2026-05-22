@@ -40,7 +40,7 @@ const supporting = [
 
 export const StreamsSection = () => {
   return (
-    <section id="streams" className="py-20 scroll-mt-16">
+    <section id="streams" className="py-14 scroll-mt-16">
       <div className="container">
         {/* Header */}
         <motion.div

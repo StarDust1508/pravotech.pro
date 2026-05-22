@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const valueProps = [
   "Презентация продукта профессиональному юридическому рынку",
@@ -13,6 +14,7 @@ const valueProps = [
 
 export const ExhibitionForm = () => {
   const { toast } = useToast();
+  const userProfile = useUserProfile();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -39,7 +41,7 @@ export const ExhibitionForm = () => {
   };
 
   return (
-    <section id="exhibition" className="py-20 scroll-mt-16">
+    <section id="exhibition" className="py-14 scroll-mt-16">
       <div className="container max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -125,6 +127,7 @@ export const ExhibitionForm = () => {
                   <input
                     required
                     name="contact_person"
+                    defaultValue={userProfile.name}
                     placeholder="Контактное лицо"
                     className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan/60 transition-colors text-sm"
                   />
@@ -134,6 +137,7 @@ export const ExhibitionForm = () => {
                     required
                     name="email"
                     type="email"
+                    defaultValue={userProfile.email}
                     placeholder="Email"
                     className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan/60 transition-colors text-sm"
                   />
@@ -141,6 +145,7 @@ export const ExhibitionForm = () => {
                     required
                     name="phone"
                     type="tel"
+                    defaultValue={userProfile.phone}
                     placeholder="Телефон"
                     className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-cyan/60 transition-colors text-sm"
                   />
