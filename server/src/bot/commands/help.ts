@@ -25,6 +25,7 @@ async function showHelp(ctx: { reply: Function }): Promise<void> {
     '/checklists — Практические чек-листы\n' +
     '/research — Аналитические исследования\n' +
     '/courses — Курсы Академии\n' +
+    '/conference — Конференция 2026\n' +
     '/my — Мои полученные материалы\n' +
     '/feedback — Обратная связь\n' +
     '/about — О платформе\n' +

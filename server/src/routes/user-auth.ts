@@ -3,11 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { query } from '../db.js';
 import { rateLimit } from '../middleware/rate-limit.js';
+import { JWT_SECRET, JWT_EXPIRES_IN } from '../config.js';
 
 const router = Router();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'pravo-tech-hub-jwt-secret-2026';
-const JWT_EXPIRES_IN = '30d';
 
 export interface AuthUser {
   id: number;

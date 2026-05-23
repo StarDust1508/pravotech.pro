@@ -18,14 +18,20 @@ const CYAN = "hsl(180 100% 50%)";
 const MAGENTA = "hsl(320 100% 60%)";
 const PIE_PALETTE = [CYAN, MAGENTA, "hsl(180 30% 55%)", "hsl(320 30% 60%)"];
 
-const axisStyle = { fill: "hsl(var(--muted-foreground))", fontSize: 12 };
+const LABEL_COLOR = "rgba(255,255,255,0.65)";
+
+const axisStyle = { fill: LABEL_COLOR, fontSize: 12 };
 
 const tooltipStyle = {
   background: "hsl(var(--card))",
   border: "1px solid hsl(var(--border))",
   borderRadius: 8,
   fontSize: 12,
+  color: LABEL_COLOR,
 };
+
+const tooltipLabelStyle = { color: LABEL_COLOR };
+const tooltipItemStyle = { color: "rgba(255,255,255,0.85)" };
 
 function ChartCard({ chart }: { chart: ResearchChart }) {
   const unit = chart.unit ?? "";
@@ -41,7 +47,7 @@ function ChartCard({ chart }: { chart: ResearchChart }) {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
               <XAxis dataKey="label" tick={axisStyle} axisLine={false} tickLine={false} />
               <YAxis tick={axisStyle} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "hsl(var(--muted) / 0.3)" }} formatter={(v) => [`${v}${unit}`, ""]} />
+              <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} itemStyle={tooltipItemStyle} cursor={{ fill: "hsl(var(--muted) / 0.3)" }} formatter={(v) => [`${v}${unit}`, ""]} />
               <Bar dataKey="value" fill={CYAN} radius={[4, 4, 0, 0]} />
             </BarChart>
           ) : chart.type === "barh" ? (
@@ -49,7 +55,7 @@ function ChartCard({ chart }: { chart: ResearchChart }) {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
               <XAxis type="number" tick={axisStyle} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="label" tick={axisStyle} axisLine={false} tickLine={false} width={130} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "hsl(var(--muted) / 0.3)" }} formatter={(v) => [`${v}${unit}`, ""]} />
+              <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} itemStyle={tooltipItemStyle} cursor={{ fill: "hsl(var(--muted) / 0.3)" }} formatter={(v) => [`${v}${unit}`, ""]} />
               <Bar dataKey="value" fill={CYAN} radius={[0, 4, 4, 0]} />
             </BarChart>
           ) : chart.type === "line" ? (
@@ -57,12 +63,12 @@ function ChartCard({ chart }: { chart: ResearchChart }) {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
               <XAxis dataKey="label" tick={axisStyle} axisLine={false} tickLine={false} />
               <YAxis tick={axisStyle} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}${unit}`, ""]} />
+              <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} itemStyle={tooltipItemStyle} formatter={(v) => [`${v}${unit}`, ""]} />
               <Line type="monotone" dataKey="value" stroke={MAGENTA} strokeWidth={2.5} dot={{ r: 4, fill: MAGENTA }} />
             </LineChart>
           ) : (
             <PieChart>
-              <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}${unit}`, ""]} />
+              <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} itemStyle={tooltipItemStyle} formatter={(v) => [`${v}${unit}`, ""]} />
               <Pie
                 data={chart.data}
                 dataKey="value"
@@ -72,9 +78,10 @@ function ChartCard({ chart }: { chart: ResearchChart }) {
                 outerRadius={90}
                 innerRadius={45}
                 paddingAngle={2}
-                label={(e: { label?: string; value?: number }) => `${e.label}: ${e.value}${unit}`}
-                labelLine={false}
+                label={({ label, value }: { label?: string; value?: number }) => `${label}: ${value}${unit}`}
+                labelLine={{ stroke: "rgba(255,255,255,0.2)", strokeWidth: 1 }}
                 fontSize={11}
+                fill={LABEL_COLOR}
               >
                 {chart.data.map((_, i) => (
                   <Cell key={i} fill={PIE_PALETTE[i % PIE_PALETTE.length]} />

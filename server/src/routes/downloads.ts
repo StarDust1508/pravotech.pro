@@ -3,14 +3,12 @@ import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { DOWNLOAD_SECRET } from '../config.js';
+import { query } from '../db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const router = Router();
-
-// Secret for signing download tokens. Falls back to a random-per-process key
-// (safe: tokens are short-lived and only valid within the same server instance).
-const DOWNLOAD_SECRET = process.env.ADMIN_PASSWORD || 'download-secret-fallback-dev';
 
 interface DownloadTokenPayload {
   file: string;
@@ -20,7 +18,7 @@ interface DownloadTokenPayload {
 // ─── POST /api/downloads/generate ────────────────────────────────────
 // Generate a signed JWT token for a one-time PDF download.
 // Body: { file: string, leadId: number }
-router.post('/generate', (req: Request, res: Response) => {
+router.post('/generate', async (req: Request, res: Response) => {
   const { file, leadId } = req.body as { file?: string; leadId?: number };
 
   if (!file || typeof file !== 'string') {
@@ -30,7 +28,11 @@ router.post('/generate', (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Missing or invalid "leadId" parameter' });
   }
 
-  // Prevent path traversal — allow subdirectories like book/ but block ../ sequences
+  const leadExists = await query('SELECT id FROM research_leads WHERE id = $1', [leadId]);
+  if (leadExists.rows.length === 0) {
+    return res.status(403).json({ error: 'Invalid lead' });
+  }
+
   const normalized = path.normalize(file).replace(/\\/g, '/');
   if (normalized.includes('..') || normalized.startsWith('/')) {
     return res.status(400).json({ error: 'Invalid file path' });

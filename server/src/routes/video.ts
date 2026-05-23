@@ -2,10 +2,9 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
+import { JWT_SECRET } from '../config.js';
 
 const router = Router();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'pravo-tech-hub-jwt-secret-2026';
 const VIDEO_DIR = process.env.VIDEO_DIR || '';
 
 // GET /video/:token — стриминг видео с Range headers

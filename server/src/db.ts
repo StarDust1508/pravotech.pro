@@ -2,6 +2,7 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { sanitizeSchemaName } from './config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
@@ -17,17 +18,16 @@ const pool = new pg.Pool({
   connectionTimeoutMillis: 5000,
 });
 
-const SCHEMA = process.env.DATABASE_SCHEMA || 'pravo';
+const SCHEMA = sanitizeSchemaName(process.env.DATABASE_SCHEMA || 'pravo');
 
-// Set search_path on every connection
 pool.on('connect', (client) => {
-  client.query(`SET search_path TO ${SCHEMA}, public`);
+  client.query(`SET search_path TO "${SCHEMA}", public`);
 });
 
 export async function query(text: string, params?: unknown[]) {
   const client = await pool.connect();
   try {
-    await client.query(`SET search_path TO ${SCHEMA}, public`);
+    await client.query(`SET search_path TO "${SCHEMA}", public`);
     return await client.query(text, params);
   } finally {
     client.release();

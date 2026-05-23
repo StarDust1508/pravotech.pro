@@ -83,7 +83,6 @@ router.post('/create', requireUser, async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'У курса не указана цена' });
     }
 
-    // Find existing pending purchase or create new one
     let purchaseId: number;
 
     const existing = await query(
@@ -98,7 +97,6 @@ router.post('/create', requireUser, async (req: Request, res: Response) => {
         return res.status(409).json({ error: 'Курс уже оплачен' });
       }
       purchaseId = purchase.id;
-      // Update amount in case price changed
       await query(
         'UPDATE purchases SET amount = $1, updated_at = NOW() WHERE id = $2',
         [priceRub, purchaseId]
@@ -107,6 +105,7 @@ router.post('/create', requireUser, async (req: Request, res: Response) => {
       const insertResult = await query(
         `INSERT INTO purchases (user_id, course_id, status, amount)
          VALUES ($1, $2::uuid, 'pending', $3)
+         ON CONFLICT (user_id, course_id) DO UPDATE SET amount = $3, updated_at = NOW()
          RETURNING id`,
         [userId, courseId, priceRub]
       );

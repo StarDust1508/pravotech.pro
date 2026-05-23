@@ -5,12 +5,9 @@ import { requireAuth } from './auth.js';
 import { rateLimit } from '../middleware/rate-limit.js';
 import { query } from '../db.js';
 import { sendBookEmail } from '../lib/mailer.js';
+import { DOWNLOAD_SECRET } from '../config.js';
 
 const router = Router();
-
-// Must match the secret used in downloads.ts for token verification.
-// In production ADMIN_PASSWORD is always set. The fallback is only for local dev.
-const DOWNLOAD_SECRET = process.env.ADMIN_PASSWORD || 'download-secret-fallback-dev';
 
 /**
  * Generate a JWT download token for a given file and lead.
@@ -68,14 +65,25 @@ router.get('/tickets', requireAuth, async (_req, res) => {
   }
 });
 
+function truncate(val: unknown, max = 500): string {
+  if (typeof val !== 'string') return '';
+  return val.slice(0, max).trim();
+}
+
 // POST exhibition lead
 router.post('/exhibition', formLimit, async (req, res) => {
   try {
     const { company_name, contact_person, email, phone, stand_size, notes } = req.body;
+    if (!company_name || typeof company_name !== 'string') {
+      return res.status(400).json({ error: 'company_name обязательно' });
+    }
+    if (!email || typeof email !== 'string' || !isValidEmail(email)) {
+      return res.status(400).json({ error: 'Некорректный email' });
+    }
     const result = await query(
       `INSERT INTO exhibition_leads (company_name, contact_person, email, phone, stand_size, notes)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [company_name, contact_person, email, phone, stand_size, notes]
+      [truncate(company_name, 200), truncate(contact_person, 200), truncate(email, 254), truncate(phone, 30), truncate(stand_size, 50), truncate(notes, 1000)]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -87,10 +95,16 @@ router.post('/exhibition', formLimit, async (req, res) => {
 router.post('/speakers', formLimit, async (req, res) => {
   try {
     const { full_name, position, company, email, stream, talk_title, talk_description } = req.body;
+    if (!full_name || typeof full_name !== 'string') {
+      return res.status(400).json({ error: 'full_name обязательно' });
+    }
+    if (!email || typeof email !== 'string' || !isValidEmail(email)) {
+      return res.status(400).json({ error: 'Некорректный email' });
+    }
     const result = await query(
       `INSERT INTO speaker_leads (full_name, position, company, email, stream, talk_title, talk_description)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [full_name, position, company, email, stream, talk_title, talk_description]
+      [truncate(full_name, 200), truncate(position, 200), truncate(company, 200), truncate(email, 254), truncate(stream, 100), truncate(talk_title, 300), truncate(talk_description, 2000)]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -102,10 +116,16 @@ router.post('/speakers', formLimit, async (req, res) => {
 router.post('/sponsors', formLimit, async (req, res) => {
   try {
     const { company_name, contact_person, email, tier, notes } = req.body;
+    if (!company_name || typeof company_name !== 'string') {
+      return res.status(400).json({ error: 'company_name обязательно' });
+    }
+    if (!email || typeof email !== 'string' || !isValidEmail(email)) {
+      return res.status(400).json({ error: 'Некорректный email' });
+    }
     const result = await query(
       `INSERT INTO sponsor_leads (company_name, contact_person, email, tier, notes)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [company_name, contact_person, email, tier, notes]
+      [truncate(company_name, 200), truncate(contact_person, 200), truncate(email, 254), truncate(tier, 50), truncate(notes, 1000)]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -117,10 +137,16 @@ router.post('/sponsors', formLimit, async (req, res) => {
 router.post('/tickets', formLimit, async (req, res) => {
   try {
     const { full_name, email, phone, ticket_type, ticket_price, payment_method } = req.body;
+    if (!full_name || typeof full_name !== 'string') {
+      return res.status(400).json({ error: 'full_name обязательно' });
+    }
+    if (!email || typeof email !== 'string' || !isValidEmail(email)) {
+      return res.status(400).json({ error: 'Некорректный email' });
+    }
     const result = await query(
       `INSERT INTO ticket_leads (full_name, email, phone, ticket_type, ticket_price, payment_method)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [full_name, email, phone, ticket_type, ticket_price, payment_method]
+      [truncate(full_name, 200), truncate(email, 254), truncate(phone, 30), truncate(ticket_type, 50), truncate(ticket_price, 20), truncate(payment_method, 50)]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -183,7 +209,7 @@ router.post('/research', formLimit, async (req, res) => {
 
       // Re-generate download token so the user can still download
       if (source_form === 'book') {
-        const downloadToken = generateDownloadToken('book/bankrotstvo-fizlic.pdf', existingLead.id);
+        const downloadToken = generateDownloadToken('bankrotstvo-fizlic.pdf', existingLead.id);
         response.downloadToken = downloadToken;
 
         if (delivery_channel === 'telegram') {
@@ -203,15 +229,15 @@ router.post('/research', formLimit, async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [
-        name.trim(),
-        email.trim().toLowerCase(),
-        phone.trim(),
-        telegram || null,
-        company || null,
-        position || null,
-        research_id,
-        research_title || null,
-        source_form || 'research_card',
+        truncate(name, 200),
+        truncate(email, 254).toLowerCase(),
+        truncate(phone, 30),
+        telegram ? truncate(telegram, 100) : null,
+        company ? truncate(company, 200) : null,
+        position ? truncate(position, 200) : null,
+        truncate(research_id, 100),
+        research_title ? truncate(research_title, 300) : null,
+        truncate(source_form || 'research_card', 50),
         channel,
       ],
     );
@@ -222,7 +248,7 @@ router.post('/research', formLimit, async (req, res) => {
     // ── Book delivery logic ────────────────────────────────────
     if (source_form === 'book') {
       // Generate a download token so user can always download via /api/downloads/:token
-      const downloadToken = generateDownloadToken('book/bankrotstvo-fizlic.pdf', lead.id);
+      const downloadToken = generateDownloadToken('bankrotstvo-fizlic.pdf', lead.id);
       response.downloadToken = downloadToken;
 
       if (channel === 'email') {
@@ -235,7 +261,7 @@ router.post('/research', formLimit, async (req, res) => {
           const emailSent = await sendBookEmail(
             email.trim().toLowerCase(),
             name.trim(),
-            'book/bankrotstvo-fizlic.pdf',
+            'bankrotstvo-fizlic.pdf',
             emailDownloadUrl,
           );
           response.emailSent = emailSent;
@@ -257,7 +283,7 @@ router.post('/research', formLimit, async (req, res) => {
     } else {
       // Non-book research leads: fire-and-forget email as before
       if (channel === 'email') {
-        sendBookEmail(email.trim().toLowerCase(), name.trim(), 'book/bankrotstvo-fizlic.pdf').catch(
+        sendBookEmail(email.trim().toLowerCase(), name.trim(), 'bankrotstvo-fizlic.pdf').catch(
           (err) => console.error('📧 Background email failed:', err),
         );
       }

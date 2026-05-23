@@ -11,6 +11,8 @@ export function mainMenuKeyboard(): InlineKeyboard {
     .text('📊 Исследования', 'menu:research')
     .text('🎓 Академия', 'menu:courses')
     .row()
+    .text('🏛 Конференция 2026', 'menu:conference')
+    .row()
     .text('📁 Мои материалы', 'menu:my')
     .text('💬 Обратная связь', 'menu:feedback')
     .row()

@@ -1351,14 +1351,6 @@ export default function CoursePage() {
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
               />
 
-              {/* Horizontal scan line */}
-              <motion.div
-                className="absolute left-0 right-0 h-[1px] pointer-events-none"
-                style={{ background: "linear-gradient(90deg, transparent, rgba(0,255,255,0.3), transparent)" }}
-                animate={{ top: ["-5%", "105%"] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-              />
-
               {/* Grid overlay for tech feel */}
               <div
                 className="absolute inset-0 pointer-events-none opacity-[0.03]"

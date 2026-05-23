@@ -7,9 +7,9 @@ import { escapeHtml } from '../utils.js';
  * Format price for display.
  */
 function formatPrice(price: string | number | null): string {
-  if (!price) return 'Бесплатно';
+  if (!price) return 'Безоплатно';
   const num = typeof price === 'string' ? parseFloat(price) : price;
-  if (isNaN(num) || num === 0) return 'Бесплатно';
+  if (isNaN(num) || num === 0) return 'Безоплатно';
   return `${num.toLocaleString('ru-RU')} руб.`;
 }
 

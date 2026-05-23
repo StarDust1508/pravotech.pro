@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { escapeHtml } from '../config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -192,11 +193,12 @@ export async function sendBookEmail(
       </p>`
     : '';
 
+  const safeUserName = escapeHtml(userName);
   const html = buildEmailHtml({
-    preheader: `${userName}, ваша книга «Банкротство физических лиц» готова к скачиванию`,
+    preheader: `${safeUserName}, ваша книга «Банкротство физических лиц» готова к скачиванию`,
     heading: 'Спасибо за интерес к теме банкротства!',
     bodyHtml: `
-      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${userName}</strong>!</p>
+      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${safeUserName}</strong>!</p>
       <p style="margin:0 0 16px 0;">Книга <strong style="color:#00e5ff;">«Банкротство физических лиц»</strong> прикреплена к этому письму в формате PDF.</p>
       <p style="margin:0 0 16px 0;">Это практическое руководство — от первых признаков неплатёжеспособности до завершения дела и списания долгов. 117 страниц, 4 части, 12 глав.</p>
       ${backupLinkBlock}
@@ -277,12 +279,14 @@ export async function sendChecklistEmail(
     return false;
   }
 
+  const safeUserName = escapeHtml(userName);
+  const safeChecklistName = escapeHtml(checklistName);
   const html = buildEmailHtml({
-    preheader: `${userName}, ваш чек-лист «${checklistName}» готов`,
+    preheader: `${safeUserName}, ваш чек-лист «${safeChecklistName}» готов`,
     heading: 'Ваш чек-лист готов!',
     bodyHtml: `
-      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${userName}</strong>!</p>
-      <p style="margin:0 0 16px 0;">Чек-лист <strong style="color:#00e5ff;">«${checklistName}»</strong> прикреплён к этому письму в формате PDF.</p>
+      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${safeUserName}</strong>!</p>
+      <p style="margin:0 0 16px 0;">Чек-лист <strong style="color:#00e5ff;">«${safeChecklistName}»</strong> прикреплён к этому письму в формате PDF.</p>
       <p style="margin:0 0 4px 0;color:rgba(255,255,255,0.5);font-size:13px;">Используйте его как структурированный план действий. Если возникнут вопросы — мы на связи.</p>
     `,
   });
@@ -323,12 +327,14 @@ export async function sendResearchEmail(
     return false;
   }
 
+  const safeUserName = escapeHtml(userName);
+  const safeResearchTitle = escapeHtml(researchTitle);
   const html = buildEmailHtml({
-    preheader: `${userName}, исследование «${researchTitle}» готово`,
+    preheader: `${safeUserName}, исследование «${safeResearchTitle}» готово`,
     heading: 'Ваше исследование готово!',
     bodyHtml: `
-      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${userName}</strong>!</p>
-      <p style="margin:0 0 16px 0;">Исследование <strong style="color:#00e5ff;">«${researchTitle}»</strong> прикреплено к этому письму в формате PDF.</p>
+      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${safeUserName}</strong>!</p>
+      <p style="margin:0 0 16px 0;">Исследование <strong style="color:#00e5ff;">«${safeResearchTitle}»</strong> прикреплено к этому письму в формате PDF.</p>
       <p style="margin:0 0 4px 0;color:rgba(255,255,255,0.5);font-size:13px;">Мы регулярно публикуем аналитику — следите за обновлениями на платформе.</p>
     `,
   });
@@ -367,11 +373,12 @@ export async function sendThankYouEmail(
     return false;
   }
 
+  const safeUserName = escapeHtml(userName);
   const html = buildEmailHtml({
-    preheader: `${userName}, спасибо за обращение в Технологии Права`,
+    preheader: `${safeUserName}, спасибо за обращение в Технологии Права`,
     heading: 'Спасибо за обращение!',
     bodyHtml: `
-      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${userName}</strong>!</p>
+      <p style="margin:0 0 16px 0;">Здравствуйте, <strong style="color:#ffffff;">${safeUserName}</strong>!</p>
       <p style="margin:0 0 16px 0;">Благодарим за интерес к платформе <strong style="color:#00e5ff;">Технологии Права</strong>. Мы получили вашу заявку и свяжемся с вами в ближайшее время.</p>
       <p style="margin:0 0 4px 0;color:rgba(255,255,255,0.5);font-size:13px;">Если у вас есть срочный вопрос — напишите нам в Telegram.</p>
     `,

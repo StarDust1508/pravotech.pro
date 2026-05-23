@@ -7,12 +7,12 @@ import dotenv from 'dotenv';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-const DB_HOST = process.env.DATABASE_HOST || '5.42.110.182';
+const DB_HOST = process.env.DATABASE_HOST || 'localhost';
 const DB_PORT = parseInt(process.env.DATABASE_PORT || '5432');
 const DB_NAME = process.env.DATABASE_NAME || 'bankruptcy_academy';
 const DB_USER = process.env.DATABASE_USER || 'ba_app';
 const DB_PASS = process.env.DATABASE_PASSWORD || '';
-const SCHEMA = process.env.DATABASE_SCHEMA || 'pravo';
+const SCHEMA = (process.env.DATABASE_SCHEMA || 'pravo').replace(/[^a-zA-Z0-9_]/g, '');
 
 async function setupDatabase() {
   console.log(`🔌 Connecting to ${DB_NAME} on ${DB_HOST} as ${DB_USER}...`);

@@ -2,10 +2,9 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { query } from '../db.js';
 import { requireUser, AuthRequest } from './user-auth.js';
+import { JWT_SECRET } from '../config.js';
 
 const router = Router();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'pravo-tech-hub-jwt-secret-2026';
 const VIDEO_TOKEN_EXPIRES = '4h';
 
 function signVideoToken(userId: number, lessonId: number, videoFilename: string): string {

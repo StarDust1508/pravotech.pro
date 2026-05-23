@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { requireAuth } from './auth.js';
 import { rateLimit } from '../middleware/rate-limit.js';
 import { query } from '../db.js';
@@ -37,10 +37,20 @@ function pickEditable(body: Record<string, unknown>, allowed: ReadonlySet<string
   return { keys, values: keys.map(k => body[k]) };
 }
 
-// GET courses (published by default, all with ?all=true)
-router.get('/courses', async (req, res) => {
+// GET courses (published by default, all with ?all=true requires admin auth)
+router.get('/courses', async (req: Request, res: Response) => {
   try {
-    const showAll = req.query.all === 'true';
+    let showAll = req.query.all === 'true';
+    if (showAll) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          requireAuth(req as any, res as any, (err?: any) => err ? reject(err) : resolve());
+        });
+      } catch {
+        return res.status(401).json({ error: 'Auth required for all=true' });
+      }
+      if (res.headersSent) return;
+    }
     const whereClause = showAll ? '' : 'WHERE is_published = true';
     const result = await query(
       `SELECT id, slug, title, description, hero_title, hero_subtitle, price, level, display_order, is_published
@@ -71,10 +81,19 @@ router.get('/courses/:slug', async (req, res) => {
   }
 });
 
-// GET teachers (published by default, all with ?all=true)
-router.get('/teachers', async (req, res) => {
+router.get('/teachers', async (req: Request, res: Response) => {
   try {
-    const showAll = req.query.all === 'true';
+    let showAll = req.query.all === 'true';
+    if (showAll) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          requireAuth(req as any, res as any, (err?: any) => err ? reject(err) : resolve());
+        });
+      } catch {
+        return res.status(401).json({ error: 'Auth required for all=true' });
+      }
+      if (res.headersSent) return;
+    }
     const whereClause = showAll ? '' : 'WHERE is_published = true';
     const result = await query(
       `SELECT id, full_name, position, bio, expertise, experience, photo_url, display_order, is_published
@@ -86,11 +105,20 @@ router.get('/teachers', async (req, res) => {
   }
 });
 
-// GET reviews (published by default, all with ?all=true; optionally by course_id)
-router.get('/reviews', async (req, res) => {
+router.get('/reviews', async (req: Request, res: Response) => {
   try {
     const { course_id } = req.query;
-    const showAll = req.query.all === 'true';
+    let showAll = req.query.all === 'true';
+    if (showAll) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          requireAuth(req as any, res as any, (err?: any) => err ? reject(err) : resolve());
+        });
+      } catch {
+        return res.status(401).json({ error: 'Auth required for all=true' });
+      }
+      if (res.headersSent) return;
+    }
     let sql = 'SELECT * FROM reviews';
     const conditions: string[] = [];
     const params: unknown[] = [];

@@ -4,6 +4,7 @@ import { registerBookCommand } from './commands/book.js';
 import { registerChecklistsCommand } from './commands/checklists.js';
 import { registerResearchCommand } from './commands/research.js';
 import { registerCoursesCommand } from './commands/courses.js';
+import { registerConferenceCommand } from './commands/conference.js';
 import { registerHelpCommand } from './commands/help.js';
 import { registerAboutCommand } from './commands/about.js';
 import { registerMyCommand } from './commands/my.js';
@@ -32,6 +33,7 @@ export function createBot(): Bot | null {
   registerChecklistsCommand(bot);
   registerResearchCommand(bot);
   registerCoursesCommand(bot);
+  registerConferenceCommand(bot);
   registerMyCommand(bot);
   registerFeedbackCommand(bot);
   registerAboutCommand(bot);
@@ -40,10 +42,11 @@ export function createBot(): Bot | null {
   // Register commands with Telegram (shows in the menu button)
   bot.api.setMyCommands([
     { command: 'start', description: 'Главное меню' },
-    { command: 'book', description: '📕 Бесплатная книга о банкротстве' },
+    { command: 'book', description: '📕 Безоплатная книга о банкротстве' },
     { command: 'checklists', description: '📋 Чек-листы' },
     { command: 'research', description: '📊 Исследования' },
     { command: 'courses', description: '🎓 Курсы' },
+    { command: 'conference', description: '🏛 Конференция 2026' },
     { command: 'my', description: '📁 Мои материалы' },
     { command: 'feedback', description: '💬 Обратная связь' },
     { command: 'about', description: 'ℹ️ О платформе' },

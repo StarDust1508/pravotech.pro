@@ -4,6 +4,11 @@ import { mainMenuKeyboard, afterChecklistKeyboard } from '../keyboards.js';
 import { escapeHtml } from '../utils.js';
 import { trackReceivedMaterial } from './my.js';
 
+interface ChecklistItem {
+  text: string;
+  group?: string;
+}
+
 export function registerChecklistsCommand(bot: Bot): void {
   bot.command('checklists', async (ctx) => {
     await ctx.replyWithChatAction('typing');
@@ -18,7 +23,7 @@ export function registerChecklistsCommand(bot: Bot): void {
 
   bot.callbackQuery(/^checklist:(.+)$/, async (ctx) => {
     await ctx.answerCallbackQuery();
-    await ctx.replyWithChatAction('upload_document');
+    await ctx.replyWithChatAction('typing');
     const slug = ctx.match[1];
     await sendChecklist(ctx, slug);
   });
@@ -27,7 +32,9 @@ export function registerChecklistsCommand(bot: Bot): void {
 async function showChecklistsList(ctx: { reply: Function }): Promise<void> {
   try {
     const result = await query(
-      'SELECT slug, title FROM checklists WHERE is_published = true ORDER BY display_order, created_at'
+      `SELECT slug, title, description
+       FROM checklists WHERE is_published = true
+       ORDER BY display_order, created_at`
     );
 
     if (result.rows.length === 0) {
@@ -48,8 +55,8 @@ async function showChecklistsList(ctx: { reply: Function }): Promise<void> {
 
     await ctx.reply(
       '📋 <b>Чек-листы для практики</b>\n\n' +
-      'Готовые чек-листы помогут вам структурировать работу ' +
-      'и не упустить важные детали.\n\n' +
+      `Доступно <b>${result.rows.length}</b> чек-листов для юристов ` +
+      'и специалистов по банкротству.\n\n' +
       'Выберите нужный чек-лист 👇',
       { parse_mode: 'HTML' as const, reply_markup: keyboard }
     );
@@ -64,10 +71,33 @@ async function showChecklistsList(ctx: { reply: Function }): Promise<void> {
   }
 }
 
+/**
+ * Render checklist items as a formatted Telegram message grouped by category.
+ */
+function renderChecklistItems(items: ChecklistItem[]): string {
+  const grouped = new Map<string, string[]>();
+  for (const item of items) {
+    const group = item.group || 'Общее';
+    if (!grouped.has(group)) {
+      grouped.set(group, []);
+    }
+    grouped.get(group)!.push(item.text);
+  }
+
+  const lines: string[] = [];
+  for (const [group, texts] of grouped) {
+    lines.push(`\n<b>${escapeHtml(group)}:</b>`);
+    for (const text of texts) {
+      lines.push(`  ☐ ${escapeHtml(text)}`);
+    }
+  }
+  return lines.join('\n');
+}
+
 async function sendChecklist(ctx: Context, slug: string): Promise<void> {
   try {
     const result = await query(
-      'SELECT title, pdf_url FROM checklists WHERE slug = $1 AND is_published = true LIMIT 1',
+      'SELECT title, description, intro, items, pdf_url FROM checklists WHERE slug = $1 AND is_published = true LIMIT 1',
       [slug]
     );
 
@@ -81,61 +111,95 @@ async function sendChecklist(ctx: Context, slug: string): Promise<void> {
       return;
     }
 
-    const { title, pdf_url } = result.rows[0];
+    const { title, description, intro, items, pdf_url } = result.rows[0];
     const safeTitle = escapeHtml(title);
 
-    if (!pdf_url) {
+    // If there's a PDF — send the file
+    if (pdf_url) {
+      if (pdf_url.startsWith('/api/media/')) {
+        const mediaId = pdf_url.replace('/api/media/', '');
+        const mediaResult = await query(
+          'SELECT data, filename, mime_type FROM media WHERE id = $1 LIMIT 1',
+          [mediaId]
+        );
+        if (mediaResult.rows.length > 0) {
+          const media = mediaResult.rows[0];
+          const buffer = Buffer.isBuffer(media.data) ? media.data : Buffer.from(media.data);
+          await ctx.replyWithDocument(
+            new InputFile(buffer, media.filename || `${slug}.pdf`),
+            {
+              caption:
+                `📋 <b>${safeTitle}</b>\n\n` +
+                '✅ Чек-лист отправлен!\n' +
+                'Используйте его как структурированный план действий.\n\n' +
+                '<i>Рекомендуем также:</i>',
+              parse_mode: 'HTML' as const,
+              reply_markup: afterChecklistKeyboard(),
+            }
+          );
+          if (ctx.from?.id) {
+            await trackReceivedMaterial(ctx.from.id, `checklist:${slug}`);
+          }
+          return;
+        }
+      } else {
+        await ctx.reply(
+          `📋 <b>${safeTitle}</b>\n\n` +
+          `📎 <a href="${pdf_url}">Скачать PDF</a>\n\n` +
+          '<i>Рекомендуем также:</i>',
+          { parse_mode: 'HTML' as const, reply_markup: afterChecklistKeyboard() }
+        );
+        if (ctx.from?.id) {
+          await trackReceivedMaterial(ctx.from.id, `checklist:${slug}`);
+        }
+        return;
+      }
+    }
+
+    // No PDF — render items as text message
+    const checklistItems: ChecklistItem[] = Array.isArray(items) ? items : [];
+
+    if (checklistItems.length === 0) {
       await ctx.reply(
         `📋 <b>${safeTitle}</b>\n\n` +
-        'PDF-файл для этого чек-листа пока готовится.\n' +
-        'Попробуйте позже.',
+        (description ? `${escapeHtml(description)}\n\n` : '') +
+        'Содержимое чек-листа готовится. Попробуйте позже.',
         { parse_mode: 'HTML' as const, reply_markup: mainMenuKeyboard() }
       );
       return;
     }
 
-    // pdf_url is /api/media/<id> for files stored in PostgreSQL
-    if (pdf_url.startsWith('/api/media/')) {
-      const mediaId = pdf_url.replace('/api/media/', '');
-      const mediaResult = await query(
-        'SELECT data, filename, mime_type FROM media WHERE id = $1 LIMIT 1',
-        [mediaId]
-      );
-      if (mediaResult.rows.length === 0) {
-        await ctx.reply(
-          '❌ <b>Файл не найден</b>\n\nФайл чек-листа не найден в хранилище.',
-          { parse_mode: 'HTML' as const, reply_markup: mainMenuKeyboard() }
-        );
-        return;
-      }
-      const media = mediaResult.rows[0];
-      const buffer = Buffer.isBuffer(media.data) ? media.data : Buffer.from(media.data);
-      await ctx.replyWithDocument(
-        new InputFile(buffer, media.filename || `${slug}.pdf`),
-        {
-          caption:
-            `📋 <b>${safeTitle}</b>\n\n` +
-            '✅ Чек-лист отправлен!\n' +
-            'Используйте его как структурированный план действий.\n\n' +
-            '<i>Рекомендуем также:</i>',
-          parse_mode: 'HTML' as const,
-          reply_markup: afterChecklistKeyboard(),
-        }
-      );
-      if (ctx.from?.id) {
-        await trackReceivedMaterial(ctx.from.id, `checklist:${slug}`);
-      }
+    // Build message with intro + grouped items
+    const introText = intro ? `<i>${escapeHtml(intro)}</i>\n` : '';
+    const itemsText = renderChecklistItems(checklistItems);
+
+    const message =
+      `📋 <b>${safeTitle}</b>\n\n` +
+      introText +
+      itemsText +
+      `\n\n📊 Всего пунктов: <b>${checklistItems.length}</b>\n\n` +
+      '✅ Сохраните это сообщение — используйте как план действий!';
+
+    // Telegram message limit is 4096 chars — split if needed
+    if (message.length <= 4096) {
+      await ctx.reply(message, {
+        parse_mode: 'HTML' as const,
+        reply_markup: afterChecklistKeyboard(),
+      });
     } else {
-      // Treat as external URL — send as a link
+      // Send intro first, then items
       await ctx.reply(
-        `📋 <b>${safeTitle}</b>\n\n` +
-        `📎 <a href="${pdf_url}">Скачать PDF</a>\n\n` +
-        '<i>Рекомендуем также:</i>',
+        `📋 <b>${safeTitle}</b>\n\n` + introText,
+        { parse_mode: 'HTML' as const }
+      );
+      await ctx.reply(
+        itemsText + `\n\n📊 Всего пунктов: <b>${checklistItems.length}</b>`,
         { parse_mode: 'HTML' as const, reply_markup: afterChecklistKeyboard() }
       );
-      if (ctx.from?.id) {
-        await trackReceivedMaterial(ctx.from.id, `checklist:${slug}`);
-      }
+    }
+
+    if (ctx.from?.id) {
+      await trackReceivedMaterial(ctx.from.id, `checklist:${slug}`);
     }
   } catch (err) {
     console.error('Send checklist error:', err);

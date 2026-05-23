@@ -295,7 +295,7 @@ export default function LessonPanel({ courseId }: LessonPanelProps) {
                         <span className="text-xs text-gray-500">{lesson.duration_minutes} мин</span>
                         {lesson.is_free && (
                           <span className="text-[10px] px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded font-medium">
-                            Бесплатно
+                            Безоплатно
                           </span>
                         )}
                         {lesson.has_test && (
