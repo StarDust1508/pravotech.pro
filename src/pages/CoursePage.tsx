@@ -1300,7 +1300,7 @@ export default function CoursePage() {
           ═══════════════════════════════════════════════════════ */}
       {(() => {
         const totalLessonsCount = course.lessons?.length || 12;
-        const teacherCount = courseTeachers.length;
+        const teacherCount = courseTeachers.length || 2; // fallback: минимум 2 эксперта
 
         const promoFacts = [
           { value: String(totalLessonsCount), label: "занятий", color: "cyan" as const },

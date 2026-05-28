@@ -8,7 +8,7 @@ import { useSettings } from "@/hooks/useSettings";
 export const Footer = () => {
   const [openDoc, setOpenDoc] = useState<DocKey | null>(null);
   const { data: settings = {} } = useSettings();
-  const tgUrl = settings.telegram_channel_url || "https://t.me/kredit_advokat";
+  const tgUrl = settings.telegram_channel_url || "https://t.me/ainovaci";
   const maxUrl = settings.max_channel_url || "https://max.ru/id645211616449_biz";
 
   return (
@@ -28,10 +28,11 @@ export const Footer = () => {
             <div>
               <h4 className="font-display font-bold text-[10px] uppercase tracking-[0.2em] mb-4 text-foreground/50">Разделы</h4>
               <nav className="space-y-2.5" aria-label="Навигация по разделам">
-                <Link to="/research" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Исследования</Link>
-                <Link to="/checklists" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Чек-листы</Link>
-                <Link to="/academy" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Академия</Link>
                 <Link to="/conference" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Конференция</Link>
+                <Link to="/academy" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Академия</Link>
+                <Link to="/research" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Исследования</Link>
+                <Link to="/articles" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Статьи</Link>
+                <Link to="/products" className="block text-sm text-muted-foreground hover:text-neon-cyan transition-colors">Продукты</Link>
               </nav>
             </div>
             <div>
@@ -61,7 +62,7 @@ export const Footer = () => {
               <h4 className="font-display font-bold text-[10px] uppercase tracking-[0.2em] mb-4 text-foreground/50">Контакты</h4>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <a href="mailto:pravotechhub@mail.ru" className="block hover:text-neon-cyan transition-colors">pravotechhub@mail.ru</a>
-                <p>Саратов, Россия</p>
+                <p>Москва, Россия</p>
               </div>
             </div>
           </div>

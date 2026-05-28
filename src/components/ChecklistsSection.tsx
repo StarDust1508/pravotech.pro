@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -140,6 +140,20 @@ export const ChecklistsSection = () => {
             })}
           </div>
         )}
+
+        {/* Telegram bot — checklist downloads */}
+        <a
+          href="https://t.me/NeuroPravo_Bot?start=checklist"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-10 flex items-center gap-3 px-5 py-3 rounded-xl border border-border bg-card/30 hover:border-neon-magenta/30 transition-colors group"
+        >
+          <ClipboardList size={18} className="text-neon-magenta/60 flex-shrink-0" />
+          <span className="text-sm text-foreground/50 group-hover:text-foreground/70 transition-colors">
+            Скачайте чек-листы в PDF через бота — напишите <span className="font-mono text-neon-magenta/70">/checklist</span> в{" "}
+            <span className="text-neon-magenta/70 font-medium">@NeuroPravo_Bot</span>
+          </span>
+        </a>
       </div>
     </section>
   );

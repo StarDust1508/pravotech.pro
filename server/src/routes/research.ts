@@ -19,6 +19,10 @@ const EDITABLE_COLUMNS = [
   'pdf_url',
   'pdf_media_id',
   'charts',
+  'is_free',
+  'price',
+  'rating',
+  'rating_count',
   'display_order',
   'is_published',
 ] as const;
@@ -55,6 +59,7 @@ router.get('/reports', async (req, res) => {
     const result = await query(
       `SELECT id, slug, title, description, category, icon, accent,
               summary, cover_image_url, pdf_url, pdf_media_id,
+              is_free, price, rating, rating_count,
               display_order, is_published, created_at, updated_at
        FROM research_reports ${whereClause}
        ORDER BY display_order, created_at`

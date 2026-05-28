@@ -14,7 +14,7 @@ export const HeroSection = () => {
   const prefersReduced = useReducedMotion();
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-16 md:pt-20">
       {/* Background */}
       <div className="absolute inset-0">
         <motion.div
@@ -29,11 +29,11 @@ export const HeroSection = () => {
             src={heroImage}
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover brightness-[1.1] saturate-[0.7]"
+            className="w-full h-full object-cover brightness-[1.6] saturate-[0.9]"
           />
         </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/15" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-background/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-background/5" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/10" />
       </div>
 
       {/* Ambient glow */}
@@ -55,9 +55,25 @@ export const HeroSection = () => {
               Аналитика · Обучение · Конференция
             </p>
 
-            <h1 className="font-display text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[0.88] mb-8">
+            <h1 className="font-display text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[0.88] mb-6">
               <BrandTitle className="leading-[0.88]" lineBreakBeforeLaw />
             </h1>
+
+            {/* Дата мероприятия — градиентная плашка */}
+            <div className="mb-8 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm">
+              <span
+                className="text-sm md:text-base font-display font-black uppercase tracking-wider"
+                style={{
+                  background: 'linear-gradient(135deg, #ff3399 0%, #ff66b2 40%, #00ffff 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                25–26 сентября 2026
+              </span>
+              <span className="h-1 w-1 rounded-full bg-white/30" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-foreground/50">Москва</span>
+            </div>
           </motion.div>
 
           <motion.div
@@ -79,17 +95,17 @@ export const HeroSection = () => {
             className="flex flex-wrap items-center gap-4 mb-16"
           >
             <Link
-              to="/research"
+              to="/conference"
               className="group inline-flex items-center gap-2 px-8 py-3.5 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-lg shadow-neon-magenta/25 hover:shadow-neon-magenta/50 transition-shadow text-sm uppercase tracking-wider"
             >
-              Исследования
+              Конференция
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
-              to="/conference"
+              to="/research"
               className="px-8 py-3.5 border border-foreground/15 text-foreground/70 font-display font-bold rounded-lg hover:border-neon-cyan/40 hover:text-neon-cyan transition-colors text-sm uppercase tracking-wider"
             >
-              Конференция
+              Исследования
             </Link>
             <Link
               to="/academy"

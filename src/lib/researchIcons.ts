@@ -7,12 +7,17 @@ import {
   Cpu,
   FileStack,
   MessageSquare,
+  Landmark,
+  Castle,
+  Megaphone,
+  AlertOctagon,
+  Briefcase,
+  Map,
+  FileSearch,
+  Building2,
   type LucideIcon,
 } from "lucide-react";
 
-// Сопоставление имён иконок (хранятся в БД как строка) с компонентами lucide.
-// Используется и в секции, и на странице отчёта, чтобы данные оставались
-// сериализуемыми (в БД лежит имя, а не сам компонент).
 const ICONS: Record<string, LucideIcon> = {
   FileText,
   TrendingUp,
@@ -22,6 +27,14 @@ const ICONS: Record<string, LucideIcon> = {
   Cpu,
   FileStack,
   MessageSquare,
+  Landmark,
+  Castle,
+  Megaphone,
+  AlertOctagon,
+  Briefcase,
+  Map,
+  FileSearch,
+  Building2,
 };
 
 export const resolveResearchIcon = (name?: string): LucideIcon =>

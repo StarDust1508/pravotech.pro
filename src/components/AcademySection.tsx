@@ -21,6 +21,7 @@ const courseCardBackgrounds: Record<string, string> = {
   "osparivanie-sdelok": osparivanieHero,
   "effektivnaya-komanda": effektivnayaKomandaHero,
   "prodazhi-yuridicheskih-uslug": prodazhiHero,
+  "eksperty-rynka-bfl": expertyBflHero,
   "6b1b4e4d-f049-4411-b339-d4ead206b851": expertyBflHero,
 };
 
@@ -277,6 +278,20 @@ export const AcademySection = () => {
             })}
           </div>
         )}
+
+        {/* Telegram bot — course advisor */}
+        <a
+          href="https://t.me/NeuroPravo_Bot?start=academy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-10 flex items-center gap-3 px-5 py-3 rounded-xl border border-border bg-card/30 hover:border-foreground/20 transition-colors group"
+        >
+          <Sparkles size={18} className="text-foreground/40 flex-shrink-0" />
+          <span className="text-sm text-foreground/50 group-hover:text-foreground/70 transition-colors">
+            Не знаете какой курс выбрать? Спросите бота —{" "}
+            <span className="text-foreground/70 font-medium">@NeuroPravo_Bot</span>
+          </span>
+        </a>
       </div>
 
       {/* Modal — course registration */}

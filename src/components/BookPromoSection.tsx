@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { BookOpen, ArrowRight } from "lucide-react";
+import { BookOpen, ArrowRight, Star } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 
 /* Mini 3D book cover — same design as BookPage */
@@ -82,6 +82,12 @@ function MiniBookCover() {
   );
 }
 
+const bookReviews = [
+  { name: "Алексей К.", role: "Арбитражный управляющий", text: "Идеально для старта — структурировано, без воды, с практическими шагами." },
+  { name: "Мария С.", role: "Юрист по БФЛ", text: "Раздала сотрудникам — теперь все на одной волне. Особенно полезны чек-листы внутри." },
+  { name: "Дмитрий Л.", role: "Руководитель практики", text: "117 страниц концентрированной пользы. Регулярно ссылаюсь на неё в работе." },
+];
+
 export const BookPromoSection = () => {
   const { data: settings = {} } = useSettings();
 
@@ -89,38 +95,79 @@ export const BookPromoSection = () => {
   const coverUrl = settings.book_cover_url || "";
 
   return (
-    <section id="book" className="py-24 relative">
+    <section id="book" className="py-16 relative">
       <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[400px] h-[400px] bg-neon-magenta/[0.03] rounded-full blur-[120px] pointer-events-none" />
       <div className="container relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-2xl border border-neon-magenta/15 bg-card/50 p-8 md:p-12 hover:border-neon-magenta/30 transition-colors"
+          className="rounded-2xl border border-neon-magenta/15 bg-card/50 p-6 md:p-8 hover:border-neon-magenta/30 transition-colors"
         >
-          <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-neon-magenta/50 mb-5">
-                Книга по БФЛ
-              </p>
-              <h2 className="font-display text-3xl md:text-4xl font-black mb-4 uppercase leading-tight">{title}</h2>
-              <p className="text-muted-foreground text-base md:text-lg mb-8 max-w-lg">
-                Понятное руководство по банкротству физических лиц: когда начинать, что с имуществом и долгами, как пройти процедуру по шагам.
-              </p>
-              <Link
-                to="/book"
-                className="group inline-flex items-center gap-2 px-8 py-3.5 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-lg shadow-neon-magenta/20 hover:shadow-neon-magenta/40 transition-shadow text-sm uppercase tracking-wider"
-              >
-                Подробнее
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </div>
-            <div className="hidden md:block">
+          <div className="grid md:grid-cols-[auto_1fr] gap-6 md:gap-8 items-center">
+            {/* Book cover — compact */}
+            <div className="flex-shrink-0 flex justify-center md:justify-start">
               {coverUrl ? (
-                <img src={coverUrl} alt={title} className="w-44 rounded-lg border border-border shadow-2xl shadow-black/30" />
+                <img src={coverUrl} alt={title} className="w-24 md:w-32 rounded-lg border border-border shadow-2xl shadow-black/30" />
               ) : (
-                <MiniBookCover />
+                <div className="w-24 md:w-32">
+                  <MiniBookCover />
+                </div>
               )}
+            </div>
+
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-neon-magenta/50">
+                  Безоплатная книга · 117 стр.
+                </p>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-bold uppercase tracking-wider">
+                  Безоплатно
+                </span>
+              </div>
+
+              <h2 className="font-display text-2xl md:text-3xl font-black mb-3 uppercase leading-tight">{title}</h2>
+
+              <p className="text-muted-foreground text-sm md:text-base mb-4 max-w-lg">
+                Руководство по банкротству физлиц: когда начинать, что с имуществом и долгами, как пройти процедуру по шагам.
+              </p>
+
+              {/* Compact reviews */}
+              <div className="flex flex-wrap gap-3 mb-5">
+                {bookReviews.map((r, i) => (
+                  <div key={i} className="flex items-start gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.05] max-w-xs">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }).map((_, si) => (
+                          <Star key={si} className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-foreground/60 leading-snug line-clamp-2">{r.text}</p>
+                      <p className="text-[9px] text-foreground/30 mt-1">{r.name} · {r.role}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  to="/book"
+                  className="group inline-flex items-center gap-2 px-6 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-lg shadow-neon-magenta/20 hover:shadow-neon-magenta/40 transition-shadow text-sm uppercase tracking-wider"
+                >
+                  Получить книгу
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <a
+                  href="https://t.me/NeuroPravo_Bot?start=book"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs text-foreground/40 hover:text-foreground/60 transition-colors"
+                >
+                  или через @NeuroPravo_Bot →
+                </a>
+              </div>
             </div>
           </div>
         </motion.div>

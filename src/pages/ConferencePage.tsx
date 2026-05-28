@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { Calendar, MapPin, Users, Mic2, Ticket, ChevronDown, Smartphone, Download, QrCode, MessageSquare, Zap, Star, Shield, ArrowRight } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, MapPin, Users, Mic2, Ticket, ChevronDown, Smartphone, Download, QrCode, MessageSquare, Zap, Star, Shield, ArrowRight, Clock, Gift, Award, TrendingUp } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import conferenceHero from "@/assets/conference-hero.png";
 import { StreamsSection } from "@/components/StreamsSection";
@@ -13,6 +13,222 @@ import { ExhibitionForm } from "@/components/ExhibitionForm";
 import { SponsorForm } from "@/components/SponsorForm";
 import { Footer } from "@/components/Footer";
 import { FloatingCubes } from "@/components/FloatingCubes";
+import { FaqSection } from "@/components/FaqSection";
+
+/* ── Countdown hook ── */
+function useCountdown(targetDate: Date) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const diff = Math.max(0, targetDate.getTime() - now.getTime());
+  const days = Math.floor(diff / 86_400_000);
+  const hours = Math.floor((diff % 86_400_000) / 3_600_000);
+  const minutes = Math.floor((diff % 3_600_000) / 60_000);
+  const seconds = Math.floor((diff % 60_000) / 1000);
+  return { days, hours, minutes, seconds, isPast: diff === 0 };
+}
+
+const conferenceFaq = [
+  {
+    question: "Когда и где пройдёт конференция?",
+    answer: "Конференция «ТехнологИИ Права» состоится 25–26 сентября 2026 года в Москве, площадка — Технополис «Инновация». Два полных дня: доклады, мастер-классы, выставка и нетворкинг.",
+  },
+  {
+    question: "Сколько стоит участие и как купить билет?",
+    answer: "Доступно несколько тарифов: от базового онлайн-участия до VIP с доступом ко всем зонам и after-party. Ранняя регистрация даёт скидку. Билеты можно приобрести на сайте в разделе «Получить билет».",
+  },
+  {
+    question: "Какие темы будут на конференции?",
+    answer: "6 тематических потоков: банкротство физических лиц, AI-инструменты для юристов, автоматизация документооборота, масштабирование юридической практики, цифровой маркетинг юридических услуг и регуляторные тренды.",
+  },
+  {
+    question: "Будет ли онлайн-трансляция?",
+    answer: "Да, для владельцев онлайн-билетов будет прямая трансляция основных потоков. Записи докладов станут доступны участникам после конференции.",
+  },
+  {
+    question: "Как скачать приложение конференции?",
+    answer: "Мобильное приложение TechForum доступно для Android (RuStore) и как веб-версия для любого устройства. В приложении: расписание, AI-ассистент, чат участников, электронный билет и навигация по площадке.",
+  },
+  {
+    question: "Можно ли стать спикером или спонсором?",
+    answer: "Да! Заявку на выступление можно подать через форму на странице конференции. Для спонсоров доступны различные пакеты участия — от стенда на выставке до генерального партнёрства. Заполните форму или напишите организаторам.",
+  },
+];
+
+/* ── Giant hero with countdown + date prominence ── */
+function ConferenceHero({ scrollToSection }: { scrollToSection: (id: string) => void }) {
+  const conferenceDate = useMemo(() => new Date(2026, 8, 25, 10, 0, 0), []); // Sep 25, 2026
+  const { days, hours, minutes, seconds, isPast } = useCountdown(conferenceDate);
+
+  const countdownUnits = [
+    { value: days, label: "дней" },
+    { value: hours, label: "часов" },
+    { value: minutes, label: "минут" },
+    { value: seconds, label: "секунд" },
+  ];
+
+  return (
+    <section className="pt-28 pb-16 relative overflow-hidden">
+      {/* Background image */}
+      <div className="absolute inset-0">
+        <img
+          src={conferenceHero}
+          alt="Конференция Технологии права"
+          className="w-full h-full object-cover opacity-25"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background) / 0.6) 55%, hsl(var(--background)) 100%)" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
+      </div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-neon-magenta/[0.04] rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-neon-cyan/[0.04] rounded-full blur-3xl" />
+
+      <div className="container relative z-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neon-magenta/30 bg-neon-magenta/10 mb-6">
+            <span className="w-2 h-2 rounded-full bg-neon-magenta animate-pulse" />
+            <span className="text-neon-magenta text-xs font-bold uppercase tracking-wider">Флагманское событие {new Date().getFullYear()}</span>
+          </div>
+
+          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-black mb-4 uppercase leading-[1.05]">
+            Конференция<br />
+            <span className="text-neon-cyan">Технолог</span><span className="text-neon-magenta">ИИ</span>{" "}
+            <span className="text-neon-cyan">Права</span>
+          </h1>
+
+          {/* ── GIANT DATE BLOCK ── */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="my-8 relative"
+          >
+            <div className="inline-flex items-center gap-3 md:gap-5 px-6 md:px-10 py-4 md:py-5 rounded-2xl border border-neon-cyan/25 bg-card/60 backdrop-blur-md relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/[0.06] via-transparent to-neon-magenta/[0.04] pointer-events-none" />
+              <Calendar className="w-7 h-7 md:w-8 md:h-8 text-neon-cyan relative flex-shrink-0" />
+              <div className="relative text-left">
+                <div className="font-display text-2xl md:text-4xl font-black leading-none">
+                  25–26 сентября {new Date().getFullYear()}
+                </div>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-neon-magenta/60" />
+                  <span className="text-sm md:text-base text-foreground/60">Москва · Технополис «Инновация»</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── COUNTDOWN ── */}
+          {!isPast && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="mb-8"
+            >
+              <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/30 mb-3">
+                До начала конференции
+              </div>
+              <div className="inline-flex items-center gap-2 md:gap-3">
+                {countdownUnits.map((u, i) => (
+                  <div key={i} className="flex items-center gap-2 md:gap-3">
+                    <div className="relative">
+                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-card/80 border border-border backdrop-blur-sm flex flex-col items-center justify-center">
+                        <AnimatePresence mode="popLayout">
+                          <motion.span
+                            key={u.value}
+                            initial={{ y: -10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 10, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="font-display text-2xl md:text-3xl font-black text-neon-cyan leading-none"
+                          >
+                            {String(u.value).padStart(2, "0")}
+                          </motion.span>
+                        </AnimatePresence>
+                        <span className="text-[8px] md:text-[9px] text-foreground/30 uppercase tracking-wider mt-1">{u.label}</span>
+                      </div>
+                    </div>
+                    {i < countdownUnits.length - 1 && (
+                      <span className="text-neon-cyan/30 font-display text-xl font-bold">:</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          <p className="text-foreground/60 text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+            Главная индустриальная площадка о технологиях и ИИ в юридическом бизнесе.
+            6 потоков, 80+ спикеров, мастер-классы, выставка и нетворкинг.
+          </p>
+
+          {/* CTA */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
+            <button
+              onClick={() => scrollToSection("tickets")}
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg text-sm uppercase tracking-wider relative overflow-hidden"
+              style={{ boxShadow: "0 8px 30px rgba(255,0,153,0.3)" }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              <Ticket size={16} className="relative" /> <span className="relative">Получить билет</span>
+            </button>
+            <button
+              onClick={() => scrollToSection("streams")}
+              className="inline-flex items-center gap-2 px-8 py-4 border border-neon-cyan/40 text-neon-cyan font-display font-bold rounded-lg hover:bg-neon-cyan/5 hover:border-neon-cyan/70 transition-colors text-sm uppercase tracking-wider"
+            >
+              Программа · 6 потоков
+            </button>
+          </div>
+
+          {/* Stats strip */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+            {[
+              { icon: Users, value: "1 500+", label: "Участников", accent: "cyan" as const },
+              { icon: Mic2, value: "80+", label: "Спикеров", accent: "magenta" as const },
+              { icon: Clock, value: "2 дня", label: "Погружения", accent: "cyan" as const },
+              { icon: Zap, value: "32", label: "Сессии и воркшопы", accent: "magenta" as const },
+            ].map((s, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + i * 0.08 }}
+                className="p-4 rounded-xl border border-border bg-card/60 backdrop-blur-sm text-center"
+              >
+                <s.icon className={`w-4 h-4 mx-auto mb-2 ${s.accent === "cyan" ? "text-neon-cyan/70" : "text-neon-magenta/70"}`} />
+                <div className={`font-display text-lg md:text-xl font-black leading-none mb-1 ${s.accent === "cyan" ? "text-neon-cyan" : "text-neon-magenta"}`}>{s.value}</div>
+                <div className="text-muted-foreground text-[10px] uppercase tracking-wider">{s.label}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Scroll cue */}
+          <motion.button
+            onClick={() => scrollToSection("streams")}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="mt-10 inline-flex flex-col items-center gap-1 text-foreground/30 hover:text-foreground/60 transition-colors group"
+            aria-label="К программе"
+          >
+            <span className="text-[10px] uppercase tracking-[0.25em] font-medium">Программа</span>
+            <motion.div
+              animate={{ y: [0, 5, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <ChevronDown size={18} />
+            </motion.div>
+          </motion.button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
 export default function ConferencePage() {
   useEffect(() => {
@@ -29,106 +245,45 @@ export default function ConferencePage() {
       <FloatingCubes />
       <Navbar />
 
-      {/* Hero */}
-      <section className="pt-28 pb-12 relative overflow-hidden">
-        {/* Background image */}
-        <div className="absolute inset-0">
-          <img
-            src={conferenceHero}
-            alt="Конференция Технологии права"
-            className="w-full h-full object-cover opacity-25"
-          />
-          {/* Vignette — чище по краям, фокус в центре */}
-          <div
-            className="absolute inset-0"
-            style={{ background: "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background) / 0.6) 55%, hsl(var(--background)) 100%)" }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
-        </div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-neon-magenta/[0.04] rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-neon-cyan/[0.04] rounded-full blur-3xl" />
+      {/* Hero — immersive with giant countdown */}
+      <ConferenceHero scrollToSection={scrollToSection} />
 
-        <div className="container relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neon-magenta/30 bg-neon-magenta/10 mb-6">
-              <span className="w-2 h-2 rounded-full bg-neon-magenta animate-pulse" />
-              <span className="text-neon-magenta text-xs font-bold uppercase tracking-wider">Флагманское событие</span>
+      {/* Early-bird marketing banner */}
+      <section className="relative -mt-1 border-y border-neon-magenta/20 bg-gradient-to-r from-neon-magenta/[0.06] via-card/50 to-neon-cyan/[0.04]">
+        <div className="container">
+          <div className="py-6 md:py-7 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 flex-wrap justify-center md:justify-start">
+              <div className="flex items-center gap-2">
+                <Gift className="w-6 h-6 text-neon-magenta flex-shrink-0" />
+                <div>
+                  <div className="font-display text-base md:text-lg font-black uppercase leading-tight">
+                    Купи билет до 30 июля
+                  </div>
+                  <div className="text-sm text-foreground/60">
+                    и получи сертификат «AI для юристов» стоимостью 15 000 ₽ в подарок
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <h1 className="font-display text-4xl md:text-6xl font-black mb-5 uppercase leading-[1.05]">
-              Конференция<br />
-              <span className="text-neon-cyan">Технолог</span><span className="text-neon-magenta">ИИ</span>{" "}
-              <span className="text-neon-cyan">Права</span>
-            </h1>
-
-            <p className="text-foreground/70 text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed">
-              Главная индустриальная площадка о технологиях и ИИ в юридическом бизнесе.<br className="hidden md:block" />
-              В фокусе — банкротство физических лиц.
-            </p>
-
-            {/* CTA */}
-            <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
+            <div className="flex items-center gap-6">
+              <div className="hidden md:flex items-center gap-4 text-sm text-foreground/40">
+                <div className="flex items-center gap-1.5">
+                  <Award className="w-4 h-4 text-neon-cyan/50" />
+                  <span>Сертификат участника</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-neon-cyan/50" />
+                  <span>Осталось 340 мест</span>
+                </div>
+              </div>
               <button
                 onClick={() => scrollToSection("tickets")}
-                className="inline-flex items-center gap-2 px-7 py-3.5 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider"
+                className="px-5 py-2.5 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg text-xs uppercase tracking-wider whitespace-nowrap hover:opacity-90 transition-opacity"
               >
-                <Ticket size={16} /> Получить билет
-              </button>
-              <button
-                onClick={() => scrollToSection("streams")}
-                className="inline-flex items-center gap-2 px-7 py-3.5 border border-neon-cyan/40 text-neon-cyan font-display font-bold rounded-lg hover:bg-neon-cyan/5 hover:border-neon-cyan/70 transition-colors text-sm uppercase tracking-wider"
-              >
-                Смотреть программу
+                Забрать билет + бонус
               </button>
             </div>
-
-            {/* Info cards — с иерархией */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
-              {/* Date — акцентная */}
-              <div className="p-5 rounded-xl border border-neon-cyan/25 bg-card/80 backdrop-blur-sm text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-neon-cyan/[0.06] to-transparent pointer-events-none" />
-                <Calendar className="w-5 h-5 text-neon-cyan mx-auto mb-3 relative" />
-                <div className="font-display text-base md:text-lg font-black relative leading-none mb-1.5">20–21 мая</div>
-                <div className="text-muted-foreground text-[11px] uppercase tracking-wider relative">{new Date().getFullYear()}</div>
-              </div>
-              {/* Location */}
-              <div className="p-5 rounded-xl border border-border bg-card/60 backdrop-blur-sm text-center">
-                <MapPin className="w-5 h-5 text-neon-magenta/80 mx-auto mb-3" />
-                <div className="font-display text-base md:text-lg font-black leading-none mb-1.5">Саратов</div>
-                <div className="text-muted-foreground text-[11px] uppercase tracking-wider">Технополис «Инновация»</div>
-              </div>
-              {/* Participants — stat */}
-              <div className="p-5 rounded-xl border border-border bg-card/60 backdrop-blur-sm text-center">
-                <Users className="w-5 h-5 text-neon-cyan/80 mx-auto mb-3" />
-                <div className="font-display text-xl md:text-2xl font-black text-neon-cyan leading-none mb-1.5">1 500+</div>
-                <div className="text-muted-foreground text-[11px] uppercase tracking-wider">Участников</div>
-              </div>
-              {/* Speakers — stat */}
-              <div className="p-5 rounded-xl border border-border bg-card/60 backdrop-blur-sm text-center">
-                <Mic2 className="w-5 h-5 text-neon-magenta/80 mx-auto mb-3" />
-                <div className="font-display text-xl md:text-2xl font-black text-neon-magenta leading-none mb-1.5">80+</div>
-                <div className="text-muted-foreground text-[11px] uppercase tracking-wider">Спикеров</div>
-              </div>
-            </div>
-
-            {/* Scroll cue */}
-            <motion.button
-              onClick={() => scrollToSection("streams")}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="mt-12 inline-flex flex-col items-center gap-1 text-foreground/30 hover:text-foreground/60 transition-colors group"
-              aria-label="К программе"
-            >
-              <span className="text-[10px] uppercase tracking-[0.25em] font-medium">Программа</span>
-              <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <ChevronDown size={18} />
-              </motion.div>
-            </motion.button>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -372,12 +527,12 @@ export default function ConferencePage() {
 
                         {/* Status bar — pixel perfect iOS */}
                         <div className="relative z-10 pt-[44px] px-5 pb-1 flex items-center justify-between">
-                          <span className="text-[9px] text-white/55 font-semibold" style={{ fontFeatureSettings: "'tnum'" }}>9:41</span>
+                          <span className="text-[9px] text-white/55 font-semibold" style={{ fontFeatureSettings: "'tnum'" }}>10:00</span>
                           <div className="flex items-center gap-[5px]">
                             {/* Signal bars */}
                             <div className="flex items-end gap-[1.5px] h-[10px]">
                               {[4, 6, 8, 10].map((h, idx) => (
-                                <div key={idx} className={`w-[2.5px] rounded-[0.5px] ${idx < 3 ? "bg-white/50" : "bg-white/20"}`} style={{ height: `${h}px` }} />
+                                <div key={idx} className="w-[2.5px] rounded-[0.5px] bg-white/50" style={{ height: `${h}px` }} />
                               ))}
                             </div>
                             <span className="text-[8px] text-white/35 font-medium">5G</span>
@@ -385,12 +540,12 @@ export default function ConferencePage() {
                             <svg className="w-[11px] h-[9px] text-white/45" viewBox="0 0 16 12" fill="currentColor">
                               <path d="M8 10.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM8 7c1.7 0 3.2.7 4.2 1.8l-1.4 1.4C10 9.4 9.1 9 8 9s-2 .4-2.8 1.2L3.8 8.8C4.8 7.7 6.3 7 8 7zm0-3.5c2.7 0 5.1 1.1 6.9 2.9l-1.4 1.4C12 6.3 10.1 5.5 8 5.5S4 6.3 2.5 7.8L1.1 6.4C2.9 4.6 5.3 3.5 8 3.5z" />
                             </svg>
-                            {/* Battery */}
+                            {/* Battery — 100% green */}
                             <div className="relative ml-[2px]">
-                              <div className="w-[20px] h-[9px] rounded-[2px] border border-white/35 relative">
-                                <div className="absolute inset-[1.5px] right-[4px] bg-neon-cyan/60 rounded-[0.5px]" />
+                              <div className="w-[20px] h-[9px] rounded-[2px] border border-emerald-400/60 relative">
+                                <div className="absolute inset-[1.5px] bg-emerald-400/80 rounded-[0.5px]" />
                               </div>
-                              <div className="absolute right-[-3px] top-[2.5px] w-[2px] h-[4px] rounded-r-[1px] bg-white/30" />
+                              <div className="absolute right-[-3px] top-[2.5px] w-[2px] h-[4px] rounded-r-[1px] bg-emerald-400/50" />
                             </div>
                           </div>
                         </div>
@@ -436,10 +591,10 @@ export default function ConferencePage() {
                         {/* Content cards — staggered reveal */}
                         <div className="px-3 mt-2.5 space-y-[5px]">
                           {[
-                            { emoji: "🎙", label: "Программа", sub: "18 докладов · 3 потока", accent: "cyan" as const, badge: "Live" },
+                            { emoji: "🎙", label: "Программа", sub: "25 сент. · 32 сессии · 6 потоков", accent: "cyan" as const, badge: "Live" },
                             { emoji: "🤖", label: "AI Ассистент", sub: "Задай любой вопрос", accent: "magenta" as const, badge: "" },
-                            { emoji: "👥", label: "Нетворкинг", sub: "246 участников", accent: "cyan" as const, badge: "New" },
-                            { emoji: "📍", label: "Навигация", sub: "Интерактивная карта", accent: "magenta" as const, badge: "" },
+                            { emoji: "👥", label: "Нетворкинг", sub: "1 500+ участников", accent: "cyan" as const, badge: "New" },
+                            { emoji: "📍", label: "Навигация", sub: "Технополис «Инновация»", accent: "magenta" as const, badge: "" },
                           ].map((card, i) => (
                             <motion.div
                               key={i}
@@ -569,29 +724,26 @@ export default function ConferencePage() {
 
                 {/* Right: Content + CTA */}
                 <div className="text-center md:text-left flex-1">
-                  <div className="flex items-center gap-2 justify-center md:justify-start mb-4">
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <span className="text-white/40 text-xs ml-1">от участников прошлого года</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neon-cyan/25 bg-neon-cyan/[0.06] mb-5">
+                    <Smartphone className="w-3.5 h-3.5 text-neon-cyan" />
+                    <span className="text-neon-cyan text-[10px] font-bold uppercase tracking-[0.2em]">Приложение ТехФорум</span>
                   </div>
 
                   <h3 className="font-display text-2xl md:text-3xl lg:text-4xl font-black uppercase leading-tight mb-4 text-white">
                     Скачай приложение —<br />
-                    <span className="text-neon-cyan">будь в центре событий</span>
+                    <span className="text-neon-cyan">будь в центре передовых событий</span>
                   </h3>
 
                   <p className="text-white/50 text-base md:text-lg mb-8 max-w-lg leading-relaxed">
-                    Программа обновляется в реальном времени. AI-ассистент ответит на любой вопрос
-                    о докладах и спикерах. Не пропусти ни одного важного момента.
+                    Расписание, AI-ассистент, электронный билет и нетворкинг —
+                    всё в одном приложении. Обновляется в реальном времени.
                   </p>
 
                   <div className="flex flex-wrap items-center gap-4 justify-center md:justify-start mb-8">
                     <motion.a
-                      href="/TechForum2026.apk"
-                      download="TechForum2026.apk"
+                      href="https://www.rustore.ru/catalog/app/com.psy_lololo.conferenceapp"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
                       className="group inline-flex items-center gap-3 px-8 py-4 bg-neon-cyan text-black font-display font-bold rounded-xl text-sm uppercase tracking-wider relative overflow-hidden"
@@ -599,7 +751,7 @@ export default function ConferencePage() {
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                       <Download size={20} className="relative" />
-                      <span className="relative">Скачать безоплатно</span>
+                      <span className="relative">RuStore — Android</span>
                       <ArrowRight size={16} className="relative group-hover:translate-x-1 transition-transform" />
                     </motion.a>
                   </div>
@@ -609,7 +761,7 @@ export default function ConferencePage() {
                     {[
                       { icon: Shield, label: "Безопасная установка" },
                       { icon: Zap, label: "Лёгкое приложение" },
-                      { icon: Smartphone, label: "Android" },
+                      { icon: Smartphone, label: "Android & Web" },
                     ].map((meta, i) => (
                       <div key={i} className="flex items-center gap-1.5">
                         <meta.icon className="w-3.5 h-3.5 text-neon-cyan/50" />
@@ -640,6 +792,46 @@ export default function ConferencePage() {
       <TicketsSection />
       <ExhibitionForm />
       <SponsorForm />
+
+      {/* Telegram bot CTA */}
+      <section className="py-12">
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-neon-cyan/20 bg-card/50 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-neon-cyan/10 border border-neon-cyan/20 flex items-center justify-center flex-shrink-0">
+                <MessageSquare className="w-6 h-6 text-neon-cyan" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-black uppercase">Telegram-бот конференции</h3>
+                <p className="text-sm text-foreground/50 mt-1">
+                  Расписание, напоминания, навигация по площадке и ответы на вопросы — через @NeuroPravo_Bot
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://t.me/NeuroPravo_Bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-neon-cyan/40 text-neon-cyan font-display font-bold rounded-lg hover:bg-neon-cyan/10 transition-colors text-sm uppercase tracking-wider whitespace-nowrap"
+            >
+              Открыть бот <ArrowRight size={14} />
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
+      <FaqSection
+        items={conferenceFaq}
+        title="Вопросы о конференции"
+        subtitle="Ответы на частые вопросы участников и партнёров"
+        accent="magenta"
+        id="conference-faq"
+      />
 
       <Footer />
     </div>

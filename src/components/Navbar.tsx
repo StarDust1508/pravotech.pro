@@ -6,12 +6,14 @@ import { BrandTitle } from "@/components/BrandTitle";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 const navItems = [
-  { label: "Исследования", to: "/research" },
-  { label: "Чек‑листы", to: "/checklists" },
-  { label: "Платформа", to: "/platform" },
-  { label: "Книга", to: "/book" },
-  { label: "Академия", to: "/academy" },
   { label: "Конференция", to: "/conference" },
+  { label: "Академия", to: "/academy" },
+  { label: "Книга", to: "/book" },
+  { label: "Обучение", to: "/platform" },
+  { label: "Исследования", to: "/research" },
+  { label: "Чек-листы", to: "/checklists" },
+  { label: "Статьи", to: "/articles" },
+  { label: "Продукты", to: "/products" },
 ];
 
 export const Navbar = () => {
@@ -24,7 +26,7 @@ export const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-white/[0.06]">
-      <div className="container flex items-center justify-between h-[88px]">
+      <div className="container flex items-center justify-between h-16 md:h-[88px]">
         {/* Brand — крупнее */}
         <Link
           to="/"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, CheckCircle2, Download, FileText } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, FileText, Lock, ShieldCheck, Star, Send } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { api } from "@/lib/api";
@@ -12,6 +12,40 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 import { useToast } from "@/hooks/use-toast";
 
 const emptyForm = { name: "", email: "", phone: "", telegram: "", company: "", position: "" };
+
+function formatPrice(price: number): string {
+  return price.toLocaleString("ru-RU") + " ₽";
+}
+
+function RatingStars({ rating, count }: { rating: number; count: number }) {
+  const r = Number(rating);
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-0.5">
+        {Array.from({ length: 5 }).map((_, i) => {
+          const filled = r >= i + 1;
+          const half = !filled && r >= i + 0.5;
+          return (
+            <Star
+              key={i}
+              size={16}
+              className={
+                filled
+                  ? "text-amber-400 fill-amber-400"
+                  : half
+                  ? "text-amber-400 fill-amber-400/50"
+                  : "text-foreground/15"
+              }
+            />
+          );
+        })}
+      </div>
+      <span className="text-sm text-foreground/50">
+        {Number(rating).toFixed(1)} ({count} {count === 1 ? "оценка" : count < 5 ? "оценки" : "оценок"})
+      </span>
+    </div>
+  );
+}
 
 const ResearchReportPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -51,7 +85,7 @@ const ResearchReportPage = () => {
         ...formData,
         research_id: report.slug,
         research_title: report.title,
-        source_form: "research_page",
+        source_form: report.is_free ? "research_page" : "research_purchase_request",
       });
       setSubmitted(true);
     } catch {
@@ -67,6 +101,7 @@ const ResearchReportPage = () => {
 
   const Icon = resolveResearchIcon(report?.icon);
   const isCyan = report?.accent !== "magenta";
+  const isFree = report?.is_free ?? true;
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,26 +137,45 @@ const ResearchReportPage = () => {
           </div>
         ) : (
           <article>
-            <div className="flex items-center gap-3 mb-4">
+            {/* Header: icon + category + price badge */}
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
               <Icon className={`w-9 h-9 ${isCyan ? "text-neon-cyan" : "text-neon-magenta"}`} />
               <span className={`text-xs font-bold uppercase tracking-wider ${isCyan ? "text-neon-cyan" : "text-neon-magenta"}`}>
                 {report.category}
               </span>
+              {isFree ? (
+                <span className="inline-block px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                  Безоплатно
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-neon-magenta/15 text-neon-magenta border border-neon-magenta/20">
+                  <Lock size={12} />
+                  {report.price ? formatPrice(report.price) : "Премиум"}
+                </span>
+              )}
             </div>
 
             <h1 className="font-display text-3xl md:text-4xl font-black mb-4 uppercase leading-tight">
               {report.title}
             </h1>
 
+            {/* Rating */}
+            {report.rating != null && report.rating_count != null && report.rating_count > 0 && (
+              <div className="mb-4">
+                <RatingStars rating={report.rating} count={report.rating_count} />
+              </div>
+            )}
+
             <p className="text-muted-foreground text-base md:text-lg mb-8">
               {report.description}
             </p>
 
+            {/* Cover image */}
             {report.cover_image_url && (
               <img
                 src={report.cover_image_url}
                 alt={report.title}
-                className="w-full rounded-xl border border-border mb-8"
+                className="w-full rounded-xl border border-border mb-8 object-cover max-h-[400px]"
               />
             )}
 
@@ -135,132 +189,303 @@ const ResearchReportPage = () => {
               <ResearchCharts charts={report.charts} />
             )}
 
-            {/* Гейт: форма получения полного отчёта */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="rounded-2xl border border-neon-magenta/30 bg-gradient-to-br from-muted/50 to-background p-6 md:p-8"
-            >
-              {submitted ? (
-                <div className="text-center py-4">
-                  <CheckCircle2 className="w-14 h-14 text-neon-cyan mx-auto mb-4" />
-                  <h3 className="font-display text-2xl font-bold mb-2">Спасибо!</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Отчёт «{report.title}» готов. Мы также отправим его на указанный email.
-                  </p>
-                  {report.pdf_url ? (
-                    <a
-                      href={report.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider"
-                    >
-                      <Download size={16} /> Скачать PDF
-                    </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Файл готовится к публикации — мы пришлём его на ваш email.
+            {/* Gate: different for free vs paid */}
+            {isFree ? (
+              /* ── FREE: lead form → download PDF ── */
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="rounded-2xl border border-neon-magenta/30 bg-gradient-to-br from-muted/50 to-background p-6 md:p-8"
+              >
+                {submitted ? (
+                  <div className="text-center py-4">
+                    <CheckCircle2 className="w-14 h-14 text-neon-cyan mx-auto mb-4" />
+                    <h3 className="font-display text-2xl font-bold mb-2">Спасибо!</h3>
+                    <p className="text-muted-foreground mb-6">
+                      Отчёт «{report.title}» готов. Мы также отправим его на указанный email.
                     </p>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <h3 className="font-display text-xl font-bold mb-1">Получить полный отчёт</h3>
-                  <p className="text-muted-foreground text-sm mb-6">
-                    Оставьте контакты — пришлём полную версию исследования.
-                  </p>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">
-                          Имя <span className="text-neon-magenta">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
-                          placeholder="Ваше имя"
-                        />
+                    {report.pdf_url ? (
+                      <a
+                        href={report.pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider"
+                      >
+                        <Download size={16} /> Скачать PDF
+                      </a>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Файл готовится к публикации — мы пришлём его на ваш email.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="font-display text-xl font-bold mb-1">Получить полный отчёт</h3>
+                    <p className="text-muted-foreground text-sm mb-6">
+                      Оставьте контакты — пришлём полную версию исследования.
+                    </p>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">
+                            Имя <span className="text-neon-magenta">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="Ваше имя"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">
+                            Email <span className="text-neon-magenta">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="email@example.com"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">
+                            Телефон <span className="text-neon-magenta">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="+7 (___) ___-__-__"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Telegram</label>
+                          <input
+                            type="text"
+                            value={formData.telegram}
+                            onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="@username"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Компания</label>
+                          <input
+                            type="text"
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="Название"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Должность</label>
+                          <input
+                            type="text"
+                            value={formData.position}
+                            onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="Должность"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-full px-6 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider disabled:opacity-50"
+                      >
+                        {submitting ? "Отправка..." : "Получить отчёт"}
+                      </button>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+                      </p>
+                    </form>
+                  </>
+                )}
+              </motion.div>
+            ) : (
+              /* ── PAID: purchase CTA ── */
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="rounded-2xl border border-neon-magenta/30 bg-gradient-to-br from-neon-magenta/5 via-muted/50 to-background p-6 md:p-8"
+              >
+                {submitted ? (
+                  <div className="text-center py-4">
+                    <CheckCircle2 className="w-14 h-14 text-neon-cyan mx-auto mb-4" />
+                    <h3 className="font-display text-2xl font-bold mb-2">Заявка принята!</h3>
+                    <p className="text-muted-foreground mb-2">
+                      Мы свяжемся с вами для оформления доступа к отчёту «{report.title}».
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Обычно это занимает не более 1 рабочего дня.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-neon-magenta/15 flex items-center justify-center">
+                        <ShieldCheck className="w-6 h-6 text-neon-magenta" />
                       </div>
                       <div>
-                        <label className="text-sm font-medium mb-1 block">
-                          Email <span className="text-neon-magenta">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
-                          placeholder="email@example.com"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">
-                          Телефон <span className="text-neon-magenta">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
-                          placeholder="+7 (___) ___-__-__"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Telegram</label>
-                        <input
-                          type="text"
-                          value={formData.telegram}
-                          onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
-                          placeholder="@username"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Компания</label>
-                        <input
-                          type="text"
-                          value={formData.company}
-                          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
-                          placeholder="Название"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Должность</label>
-                        <input
-                          type="text"
-                          value={formData.position}
-                          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
-                          placeholder="Должность"
-                        />
+                        <h3 className="font-display text-xl font-bold">Получить полный отчёт</h3>
+                        {report.price && (
+                          <p className="text-neon-magenta font-display font-bold text-lg">
+                            {formatPrice(report.price)}
+                          </p>
+                        )}
                       </div>
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="w-full px-6 py-3 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider disabled:opacity-50"
-                    >
-                      {submitting ? "Отправка..." : "Получить отчёт"}
-                    </button>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Нажимая кнопку, вы соглашаетесь на обработку персональных данных
-                    </p>
-                  </form>
-                </>
-              )}
-            </motion.div>
+                    <div className="mb-6 p-4 rounded-xl bg-muted/30 border border-border">
+                      <p className="text-sm text-foreground/70 mb-3">В полном отчёте:</p>
+                      <ul className="space-y-2">
+                        {[
+                          "Полная аналитика и все данные исследования",
+                          "Детальные графики и таблицы",
+                          "Экспертные выводы и рекомендации",
+                          "PDF-формат для удобного чтения",
+                        ].map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-sm text-foreground/60">
+                            <CheckCircle2 size={14} className="text-neon-magenta mt-0.5 shrink-0" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Quick buy / telegram link */}
+                    <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                      <a
+                        href={`https://t.me/pravo_tech_bot?start=buy_research_${report.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-neon-magenta text-primary-foreground font-display font-bold rounded-lg shadow-neon-magenta hover:opacity-90 transition-opacity text-sm uppercase tracking-wider"
+                      >
+                        <Send size={16} />
+                        {report.price ? `Купить за ${formatPrice(report.price)}` : "Купить отчёт"}
+                      </a>
+                    </div>
+
+                    <div className="relative mb-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border" />
+                      </div>
+                      <div className="relative flex justify-center">
+                        <span className="bg-background px-4 text-xs text-muted-foreground uppercase tracking-wider">
+                          или оставьте заявку
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Request access form */}
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">
+                            Имя <span className="text-neon-magenta">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="Ваше имя"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">
+                            Email <span className="text-neon-magenta">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="email@example.com"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">
+                            Телефон <span className="text-neon-magenta">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="+7 (___) ___-__-__"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Telegram</label>
+                          <input
+                            type="text"
+                            value={formData.telegram}
+                            onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="@username"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Компания</label>
+                          <input
+                            type="text"
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="Название"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1 block">Должность</label>
+                          <input
+                            type="text"
+                            value={formData.position}
+                            onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                            placeholder="Должность"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-full px-6 py-3 border border-neon-magenta text-neon-magenta font-display font-bold rounded-lg hover:bg-neon-magenta/10 transition-colors text-sm uppercase tracking-wider disabled:opacity-50"
+                      >
+                        {submitting ? "Отправка..." : "Запросить доступ"}
+                      </button>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+                      </p>
+                    </form>
+                  </>
+                )}
+              </motion.div>
+            )}
           </article>
         )}
       </main>

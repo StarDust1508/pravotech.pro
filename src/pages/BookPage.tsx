@@ -3,6 +3,30 @@ import { motion } from "framer-motion";
 import { BookOpen, Check, Download, CheckCircle2, ArrowRight, Mail, Send } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { FaqSection } from "@/components/FaqSection";
+
+const bookFaq = [
+  {
+    question: "Для кого написана книга?",
+    answer: "Для тех, кто сам думает о банкротстве и хочет понять процедуру без юридического тумана. Для юристов и помощников — как структурированная база по БФЛ. Для тех, кто помогает близким разобраться с долгами.",
+  },
+  {
+    question: "Сколько стоит книга?",
+    answer: "Книга полностью безоплатна. Получить можно через Telegram-бот @NeuroPravo_Bot или по email.",
+  },
+  {
+    question: "Какие темы разобраны в книге?",
+    answer: "Правовые основы банкротства, подготовка к процедуре, сбор документов, судебная процедура (реструктуризация, реализация имущества), внесудебное банкротство через МФЦ, последствия банкротства и жизнь после процедуры. 117 страниц, 4 части и 12 глав.",
+  },
+  {
+    question: "Можно ли самостоятельно пройти банкротство по книге?",
+    answer: "Книга даёт полное понимание процедуры и подготовки. Однако для судебного банкротства обязателен арбитражный (финансовый) управляющий. Книга поможет подготовиться, собрать документы и понять, чего ожидать на каждом этапе.",
+  },
+  {
+    question: "Когда была последняя редакция?",
+    answer: "Книга обновлена в мае 2026 года с учётом последних изменений законодательства и актуальной судебной практики.",
+  },
+];
 import { FloatingCubes } from "@/components/FloatingCubes";
 import { TechCard } from "@/components/ui/TechCard";
 import { api } from "@/lib/api";
@@ -450,6 +474,7 @@ const BookPage = () => {
         </div>
       </section>
 
+      <FaqSection items={bookFaq} title="Вопросы о книге" accent="magenta" />
       <Footer />
     </div>
   );

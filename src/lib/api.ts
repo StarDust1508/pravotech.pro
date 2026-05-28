@@ -192,6 +192,10 @@ export interface ResearchReport {
   pdf_url: string;
   pdf_media_id: string | null;
   charts: ResearchChart[] | null;
+  is_free: boolean;
+  price: number | null;
+  rating: number | null;
+  rating_count: number | null;
   display_order: number;
   is_published: boolean;
   created_at: string;
@@ -570,6 +574,16 @@ export const api = {
         body: JSON.stringify(data),
       }),
     me: () => userRequest<User>('/user-auth/me'),
+    updateMe: (data: { name: string; phone: string }) =>
+      userRequest<User>('/user-auth/me', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    linkDevice: (device_id: string) =>
+      userRequest<{ ok: boolean }>('/user-auth/link-device', {
+        method: 'POST',
+        body: JSON.stringify({ device_id }),
+      }),
   },
 
   lessons: {

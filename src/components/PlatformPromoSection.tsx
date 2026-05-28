@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { MessagesSquare, GraduationCap, BarChart3, ArrowRight } from "lucide-react";
+import { Brain, BookOpenCheck, Award, ArrowRight } from "lucide-react";
 
 const highlights = [
-  { icon: MessagesSquare, text: "Диалоговые тренировки с ИИ-клиентами" },
-  { icon: GraduationCap, text: "Тесты и аттестация сотрудников" },
-  { icon: BarChart3, text: "Аналитика прогресса и слабых тем" },
+  { icon: Brain, text: "AI-тренировки с реалистичными должниками" },
+  { icon: BookOpenCheck, text: "Интерактивные кейсы из арбитражной практики" },
+  { icon: Award, text: "Сертификат с QR-верификацией — 24 акад. часа" },
 ];
 
 export const PlatformPromoSection = () => {
@@ -20,13 +20,13 @@ export const PlatformPromoSection = () => {
             viewport={{ once: true }}
           >
             <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-neon-cyan/50 mb-5">
-              Платформа тренировок
+              Повышение квалификации по ФЗ-127
             </p>
             <h2 className="font-display text-3xl md:text-4xl font-black mb-5 uppercase leading-tight">
-              Команда учится на симуляторе, не на клиентах
+              Legal<span className="text-neon-cyan">Hunter</span> — обучение, которое работает
             </h2>
             <p className="text-muted-foreground text-base md:text-lg mb-8 max-w-lg">
-              Диалоговый тренажёр, экзамены, разбор слабых тем и аналитика прогресса — системная подготовка юристов и менеджеров по банкротству.
+              Образовательная платформа для арбитражных управляющих: AI-тренировки, интерактивные кейсы, модульная аттестация и сертификат за 24 академических часа.
             </p>
             <Link
               to="/platform"

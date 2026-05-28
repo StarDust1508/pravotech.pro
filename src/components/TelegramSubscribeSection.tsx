@@ -22,8 +22,8 @@ export const TelegramSubscribeSection = () => {
   const channel =
     settings.telegram_channel_username ||
     channelFromUrl(settings.telegram_channel_url || "") ||
-    "kredit_advokat";
-  const url = settings.telegram_channel_url || `https://t.me/${channel}`;
+    "ainovaci";
+  const url = settings.telegram_channel_url || "https://t.me/ainovaci";
   const text =
     settings.telegram_channel_text ||
     "Разборы дел, изменения в законодательстве о банкротстве, чек-листы и кейсы — коротко и по делу.";

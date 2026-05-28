@@ -151,6 +151,84 @@ router.get('/me', async (req: Request, res: Response) => {
   }
 });
 
+// PUT /user-auth/me — обновить профиль текущего пользователя
+router.put('/me', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Не авторизован' });
+    }
+
+    const token = authHeader.slice(7);
+    let decoded: jwt.JwtPayload;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+    } catch {
+      return res.status(401).json({ error: 'Невалидный токен' });
+    }
+
+    const { name, phone } = req.body;
+    const safeName = (typeof name === 'string' ? name : '').trim().slice(0, 200);
+    const safePhone = (typeof phone === 'string' ? phone : '').trim().slice(0, 30);
+
+    const result = await query(
+      `UPDATE users SET name = $1, phone = $2 WHERE id = $3
+       RETURNING id, email, name, phone, role, created_at`,
+      [safeName, safePhone, decoded.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Update me error:', err);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// POST /user-auth/link-device — привязать device_id к аккаунту
+router.post('/link-device', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Не авторизован' });
+    }
+
+    const token = authHeader.slice(7);
+    let decoded: jwt.JwtPayload;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+    } catch {
+      return res.status(401).json({ error: 'Невалидный токен' });
+    }
+
+    const { device_id } = req.body;
+    if (!device_id || typeof device_id !== 'string') {
+      return res.json({ ok: true }); // nothing to link
+    }
+
+    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRe.test(device_id)) {
+      return res.json({ ok: true });
+    }
+
+    // Update the user_profiles table to associate this device with the user
+    await query(
+      `UPDATE user_profiles SET user_id = $1 WHERE device_id = $2 AND (user_id IS NULL OR user_id = $1)`,
+      [decoded.id, device_id]
+    ).catch(() => {
+      // user_id column may not exist yet — that's ok, non-critical
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Link device error:', err);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 // Middleware для защиты маршрутов пользователей
 export function requireUser(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;

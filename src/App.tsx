@@ -20,6 +20,8 @@ const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const LearnPage = lazy(() => import("./pages/LearnPage"));
 const CoursePage = lazy(() => import("./pages/CoursePage"));
+const ArticlesPage = lazy(() => import("./pages/ArticlesPage"));
+const ProductsPage = lazy(() => import("./pages/ProductsPage"));
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
@@ -43,7 +45,16 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 const queryClient = new QueryClient();
 
 const L = ({ children }: { children: ReactNode }) => (
-  <Suspense fallback={<div className="min-h-screen bg-background" />}>{children}</Suspense>
+  <Suspense fallback={
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 rounded-xl border border-neon-cyan/20 bg-neon-cyan/5 flex items-center justify-center animate-pulse">
+          <span className="text-neon-cyan text-lg font-display font-black">ИИ</span>
+        </div>
+        <div className="h-1 w-24 bg-gradient-to-r from-transparent via-neon-cyan/30 to-transparent rounded-full animate-pulse" />
+      </div>
+    </div>
+  }>{children}</Suspense>
 );
 
 const App = () => (
@@ -67,6 +78,8 @@ const App = () => (
             <Route path="/courses/:slug/learn" element={<L><LearnPage /></L>} />
             <Route path="/profile" element={<L><ProfilePage /></L>} />
             <Route path="/conference" element={<L><ConferencePage /></L>} />
+            <Route path="/articles" element={<L><ArticlesPage /></L>} />
+            <Route path="/products" element={<L><ProductsPage /></L>} />
             <Route path="/admin" element={<L><Admin /></L>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

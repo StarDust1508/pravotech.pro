@@ -1,35 +1,40 @@
 import { motion } from "framer-motion";
-import { BarChart3, BookOpen, GraduationCap, Mic2, Users } from "lucide-react";
+import { BarChart3, BookOpen, GraduationCap, Mic2, Users, Bot, FileCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const features: { icon: typeof BookOpen; title: string; desc: string; accent: "cyan" | "magenta" }[] = [
+const features: { icon: typeof BookOpen; title: string; desc: string; accent: "cyan" | "magenta"; link?: string }[] = [
   {
-    icon: BookOpen,
-    title: "Исследования рынка",
-    desc: "Глубокая аналитика рынка БФЛ, трендов автоматизации и внедрения ИИ в юридическую практику",
-    accent: "cyan",
+    icon: Mic2,
+    title: "Конференция",
+    desc: "Флагманское мероприятие: 80+ спикеров, 6 потоков, выставка и нетворкинг лидеров рынка БФЛ",
+    accent: "magenta",
+    link: "/conference",
   },
   {
     icon: GraduationCap,
-    title: "Академия",
-    desc: "Онлайн-курсы по банкротству физлиц, управлению командой, продажам и маркетингу для юристов",
+    title: "Академия и курсы",
+    desc: "Системное обучение от старта до экспертного уровня с аттестацией и сертификатом",
     accent: "magenta",
-  },
-  {
-    icon: Mic2,
-    title: "Отраслевая конференция",
-    desc: "Флагманское мероприятие с ведущими экспертами индустрии, 6 тематических потоков и выставка",
-    accent: "magenta",
+    link: "/academy",
   },
   {
     icon: BarChart3,
-    title: "Аналитика и AI",
-    desc: "Обзоры технологий, кейсы внедрения и прогнозы развития цифровых инструментов в праве",
+    title: "Исследования и аналитика",
+    desc: "Глубокие отчёты по рынку БФЛ, экономика практики, ИИ-инструменты и технологии лидеров",
     accent: "cyan",
+    link: "/research",
+  },
+  {
+    icon: FileCheck,
+    title: "Инструменты юриста",
+    desc: "Чек-листы, тренажёры, шаблоны — всё для ускорения и масштабирования практики",
+    accent: "cyan",
+    link: "/products",
   },
   {
     icon: Users,
-    title: "Экспертное сообщество",
-    desc: "Площадка для нетворкинга, обмена опытом и партнерства лидеров юридического рынка",
+    title: "Сообщество и нетворкинг",
+    desc: "Площадка для обмена опытом, партнёрства и роста вместе с лидерами юридического рынка",
     accent: "cyan",
   },
 ];
@@ -46,32 +51,32 @@ export const AboutProjectSection = () => {
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-neon-cyan/50 mb-5">
-            Экосистема
+            Маркетплейс возможностей
           </p>
           <h2 className="font-display text-3xl md:text-5xl font-black mb-6 uppercase">
-            О проекте
+            Всё для роста вашей практики
           </h2>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
             <span className="font-semibold">
-              <span className="text-neon-cyan">Технолог</span><span className="text-neon-magenta font-bold">ии</span>{" "}
-              <span className="text-neon-cyan">права</span>
-            </span> — платформа
-            об искусственном интеллекте, цифровых технологиях и масштабировании юридического
-            бизнеса в сфере банкротства физических лиц.
+              <span className="text-neon-cyan">Технолог</span><span className="text-neon-magenta font-bold">ИИ</span>{" "}
+              <span className="text-neon-cyan">Права</span>
+            </span> — экосистема
+            для юристов и руководителей практик в&nbsp;сфере БФЛ. Конференция, обучение,
+            аналитика и инструменты — зарабатывайте больше, работая эффективнее.
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-5">
           {features.map((f, i) => {
             const isCyan = f.accent === "cyan";
-            return (
+            const card = (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
-                className={`relative p-6 rounded-xl border bg-card transition-all group overflow-hidden hover:shadow-lg ${
+                className={`relative p-6 rounded-xl border bg-card transition-all group overflow-hidden hover:shadow-lg h-full ${
                   isCyan
                     ? "border-border hover:border-neon-cyan/40 hover:shadow-neon-cyan/5"
                     : "border-border hover:border-neon-magenta/40 hover:shadow-neon-magenta/5"
@@ -84,6 +89,11 @@ export const AboutProjectSection = () => {
                 <h3 className="font-display text-sm font-bold mb-2 uppercase tracking-wide">{f.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
               </motion.div>
+            );
+            return f.link ? (
+              <Link key={i} to={f.link} className="block h-full">{card}</Link>
+            ) : (
+              <div key={i}>{card}</div>
             );
           })}
         </div>

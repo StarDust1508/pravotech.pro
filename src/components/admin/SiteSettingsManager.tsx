@@ -88,11 +88,11 @@ export function SiteSettingsManager() {
       <Section title="Главный экран (Hero)">
           <div>
             <Label className="text-xs">Дата мероприятия</Label>
-            <Input value={settings.hero_date || ""} onChange={e => updateField("hero_date", e.target.value)} placeholder="20–21 МАЯ 2026" className="mt-1" />
+            <Input value={settings.hero_date || ""} onChange={e => updateField("hero_date", e.target.value)} placeholder="25–26 СЕНТЯБРЯ 2026" className="mt-1" />
           </div>
           <div>
             <Label className="text-xs">Место проведения</Label>
-            <Input value={settings.hero_location || ""} onChange={e => updateField("hero_location", e.target.value)} placeholder="Саратов, Технополис «Инновация»" className="mt-1" />
+            <Input value={settings.hero_location || ""} onChange={e => updateField("hero_location", e.target.value)} placeholder="Москва, Технополис «Инновация»" className="mt-1" />
           </div>
           <div>
             <Label className="text-xs">Заголовок</Label>
